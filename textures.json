@@ -1,0 +1,52 @@
+{
+  "bomb.texture": "src/textures/PowerUps/Bomb/metal_0074_color_1k.jpg",
+  "bomb.ao": "src/textures/PowerUps/Bomb/metal_0074_ao_1k.jpg",
+  "bomb.normal": "src/textures/PowerUps/Bomb/metal_0074_normal_directx_1k.png",
+  "bomb.lava.texture": "src/textures/PowerUps/Bomb/Lava004_1K-JPG_Color.jpg",
+  "bomb.lava.normal": "src/textures/PowerUps/Bomb/Lava004_1K-JPG_NormalDX.jpg",
+  
+  "box.faceTexture": "src/textures/StacticObjects/PowerBox/wood_0004_color_1k.jpg",
+  "box.faceAo": "src/textures/StacticObjects/PowerBox/wood_0004_ao_1k.jpg",
+  "box.faceNormal": "src/textures/StacticObjects/PowerBox/wood_0004_normal_directx_1k.png",
+  "box.barTexture": "src/textures/StacticObjects/PowerBox/wood_0006_color_1k.jpg",
+  "box.barAo": "src/textures/StacticObjects/PowerBox/wood_0006_ao_1k.jpg",
+  "box.barNormal": "src/textures/StacticObjects/PowerBox/wood_0006_normal_directx_1k.png",
+  
+  "coffee.cupTexture": "src/textures/PowerUps/Coffee/Marble021_1K-JPG_Color.jpg",
+  "coffee.cupNormalTexture": "src/textures/PowerUps/Coffee/Marble021_1K-JPG_NormalDX.jpg",
+  
+  "ground.texture": "src/textures/StacticObjects/Ground/aerial_rocks_01_diff_1k.jpg",
+  "ground.ao": "src/textures/StacticObjects/Ground/aerial_rocks_01_ao_1k.jpg",
+  "ground.normal": "src/textures/StacticObjects/Ground/aerial_rocks_01_nor_gl_1k.jpg",
+  
+  "kar.yellowTexture": "src/textures/Kar/metal_0081_ao_1k.jpg",
+  "kar.yellowNormal": "src/textures/Kar/metal_0081_normal_directx_1k.png",
+  "kar.blackTexture": "src/textures/Kar/Metal033_1K-JPG_Color.jpg",
+  "kar.blackNormal": "src/textures/Kar/Metal033_1K-JPG_NormalGL.jpg",
+  "kar.metalTexture": "src/textures/Kar/metal_0002_color_1k.jpg",
+  "kar.metalNormal": "src/textures/Kar/metal_0002_normal_directx_1k.png",
+  "kar.windowTexture": "src/textures/Kar/decals_0008_color_1k.jpg",
+  "kar.windowNormal": "src/textures/Kar/decals_0008_normal_directx_1k.png",
+  "kar.wheelTexture": "src/textures/Kar/plastic_0022_ao_1k.jpg",
+  "kar.wheelNormal": "src/textures/Kar/plastic_0022_normal_1k.jpg",
+  
+  "hud": "src/textures/Hud/hud_atlas.png",
+  
+  "raceTrack.texture": "src/textures/StacticObjects/RaceTrack/Road007_1K-JPG_Color.jpg",
+  "raceTrack.normal": "src/textures/StacticObjects/RaceTrack/Road007_1K-JPG_NormalDX.jpg",
+  
+  "sky.hdr": "src/textures/Sky/autumn_hill_view_1k.hdr",
+  "sky.cubemapr": "src/textures/Sky/Cubemap/Cubemap_Sky_05-512x512.png",
+  
+  "trafficCone.ao": "src/textures/StacticObjects/Conne/plastic_0020_ao_1k.jpg",
+  "trafficCone.normal": "src/textures/StacticObjects/Conne/plastic_0020_normal_direct_1k.png",
+  
+  "usb.texture": "src/textures/StacticObjects/Usb/others_0013_color_1k.jpg",
+  "usb.ao": "src/textures/StacticObjects/Usb/others_0013_ao_1k.jpg",
+  "usb.normal": "src/textures/StacticObjects/Usb/others_0013_normal_directx_1k.png",
+
+  "wall.texture": "src/textures/StacticObjects/Walls/bricks_0007_color_1k.jpg",
+  "wall.ao": "src/textures/StacticObjects/Walls/bricks_0007_ao_1k.jpg",
+  "wall.normal": "src/textures/StacticObjects/Walls/bricks_0007_normal_directx_1k.png",
+  "wall.roughness": "src/textures/StacticObjects/Walls/bricks_0007_roughness_1k.jpg"
+}
