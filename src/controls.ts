@@ -58,6 +58,13 @@ export function setupControls(): void {
     }
   });
 
+  // Toggle third-person submode when 'v' is pressed
+  window.addEventListener('keypress', e => {
+    if (e.key === 'v' || e.key === 'V') {
+      cameraMode = cameraMode === 2? cameraMode = 0 : cameraMode = 2; 
+    }
+  });
+
   // Toggle godMode when 'g' is pressed
   window.addEventListener('keypress', e => {
     if (e.key === 'g' || e.key === 'G') {

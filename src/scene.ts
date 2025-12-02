@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+import { createCameraControls } from './utils/cameraControls';
 /**
  * Global scene objects exported for use across the app.
  * - scene: main THREE.Scene instance
@@ -90,7 +91,7 @@ export function initScene(): void {
   //scene.add(new THREE.GridHelper(20, 20));
 
   // 7) Controls - OrbitControls creation is optional; left commented intentionally.
-  //controls = new OrbitControls(camera, renderer.domElement);
+  controls = createCameraControls(camera, renderer);
   //controls.enableDamping = true;
 
   // 8) Resize handler - keeps camera aspect and renderer size correct on window resize

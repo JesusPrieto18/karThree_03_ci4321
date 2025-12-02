@@ -81,6 +81,7 @@ Se alternan con la tecla `C`.
 | **Flecha derecha** | Girar a la derecha |
 | **C** | Cambiar cámara |
 | **B** | Alternar con vista reversa |
+| **v** | Control total de la cámara |
 | **Espacio** | Usar PowerUp|
 
 ---
