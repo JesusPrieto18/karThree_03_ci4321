@@ -3,8 +3,8 @@ import { Kart } from "../kart";
 import { TrafficCone } from "../trafficCone";
 import { Walls } from "../walls";
 import { USB } from "../usb";
-import { Ground } from "../Ground";
-import { RaceTrack } from "../RaceTrack";
+import { Ground } from "../ground";
+import { RaceTrack } from "../raceTrack";
 import { SkyBox } from "../skyBox";
 
 /*
