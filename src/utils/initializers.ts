@@ -3,9 +3,10 @@ import { Kart } from "../kart";
 import { TrafficCone } from "../trafficCone";
 import { Walls } from "../walls";
 import { USB } from "../usb";
-import { Ground } from "../Ground";
-import { RaceTrack } from "../RaceTrack";
+import { Ground } from "../ground";
+import { RaceTrack } from "../raceTrack";
 import { SkyBox } from "../skyBox";
+import { DayNightCycle } from "../dayNightCycle";
 
 /*
  * Initialization module - factory helpers to create scene entities.
@@ -22,6 +23,7 @@ import { SkyBox } from "../skyBox";
 
 // Global instances / collections created by helpers
 export let kart: Kart;
+export let skyBox: SkyBox;
 export let listPowerUps: PowerUp[] = [];
 export let trafficCones: TrafficCone[] = []; // list of traffic cones (obstacles/decorators)
 export let decorators: any[] = []; // generic list for decorative objects
@@ -254,6 +256,12 @@ export function createHollowSquare(size?: number,thickness?: number){
 }
 
 export function createSkyBox(): void {
-  const skybox = new SkyBox();
-  decorators.push(skybox);
+  skyBox = new SkyBox();
+  decorators.push(skyBox);
+}
+
+export function createDayNightCycle(): void {
+  // DayNightCycle instance creation moved to main animation loop for deltaTime access
+  const dayNightCycle = new DayNightCycle();
+  decorators.push(dayNightCycle);
 }

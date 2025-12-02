@@ -31,6 +31,7 @@ firstVersion
 
 
 !src/textures/
+!src/textures/Sky/Cubemap/Cubemap_Sky_15-512x512.png
 !src/textures/Hud/hud_atlas.png
 !src/textures/PowerUps/Bomb/metal_0074_color_1k.jpg
 !src/textures/PowerUps/Bomb/metal_0074_ao_1k.jpg

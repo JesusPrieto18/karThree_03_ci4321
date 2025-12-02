@@ -1,7 +1,8 @@
 import {initScene} from './src/scene.ts';
 import {createConeSquare, createFourWalls, createHeartCones, 
          createKart, createMultiplePowerUpsRandom, createPowerUp, createTrafficCone, 
-         createUSB, createGround, createHollowSquare, createSkyBox} from './src/utils/initializers.ts';
+         createUSB, createGround, createHollowSquare, createSkyBox,
+         createDayNightCycle} from './src/utils/initializers.ts';
 import { setupControls} from './src/controls.ts';
 import { animate } from './src/utils/animation.ts';
 import { preloadTexturesFromConfig} from './src/utils/textureManager.ts';   
@@ -11,6 +12,7 @@ async function main() {
     await preloadTexturesFromConfig();
     initScene();
     createSkyBox();
+    createDayNightCycle();
     createGround();
     createHollowSquare(120, 28);
     setupControls();

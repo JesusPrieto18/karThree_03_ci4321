@@ -12,7 +12,7 @@ export let scene: THREE.Scene;
 export let camera: THREE.PerspectiveCamera;
 export let renderer: THREE.WebGLRenderer;
 export let controls: OrbitControls;
-export let dir: THREE.DirectionalLight;
+export let sunLight: THREE.DirectionalLight;
 /**
  * initScene - initialize the Three.js scene, camera, renderer, lights and helpers.
  *
@@ -75,14 +75,14 @@ export function initScene(): void {
 
 
   // 5) Lights - directional light to simulate sunlight
-  dir = new THREE.DirectionalLight(0xffffff, 5);
-  dir.position.set(100, 30, 0);
+  sunLight = new THREE.DirectionalLight(0xffffff, 5);
+  sunLight.position.set(100, 30, 0);
   //dir.castShadow = true; // toggle shadows if needed
-  dir.intensity = 4;
-  scene.add(dir);
+  sunLight.intensity = 4;
+  scene.add(sunLight);
 
   // Optional helper to visualize the directional light (disabled by default)
-  const dirHelper = new THREE.DirectionalLightHelper(dir, 2, 0xff0000);
+  const dirHelper = new THREE.DirectionalLightHelper(sunLight, 2, 0xff0000);
   //scene.add(dirHelper);
 
   // 6) Helpers - axes and grid help during development and debugging

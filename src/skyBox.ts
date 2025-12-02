@@ -3,8 +3,10 @@ import { scene } from './scene';
 import { getTexture } from './utils/textureManager';
 
 export class SkyBox {
-    private skyBoxMesh: THREE.Mesh;
-    private faceTextures: THREE.Texture[] = [];
+    private skyBoxMeshDay: THREE.Mesh;
+    private skyBoxMeshNight: THREE.Mesh;
+    private faceTextureDay: THREE.Texture[] = [];
+    private faceTextureNight: THREE.Texture[] = [];
     // Cada celda del atlas (4 x 3)
     private GRID_COLS = 4;
     private GRID_ROWS = 3;
@@ -21,43 +23,67 @@ export class SkyBox {
 
     constructor() {
         this.createFacesFromAtlas();
-        const materials = this.faceTextures.map(tex =>
+        const materialDay = this.faceTextureDay.map(tex =>
+            new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide })
+        );
+
+        const materialNight = this.faceTextureNight.map(tex =>
             new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide })
         );
 
         const skyGeo = new THREE.BoxGeometry(1000, 1000, 1000);
-        this.skyBoxMesh = new THREE.Mesh(skyGeo, materials);
-        scene.add(this.skyBoxMesh);
+        this.skyBoxMeshDay = new THREE.Mesh(skyGeo, materialDay);
+        this.skyBoxMeshNight = new THREE.Mesh(skyGeo, materialNight);
+        this.skyBoxMeshNight.scale.set(1.01, 1.01, 1.01); // Slightly larger to avoid z-fighting
+        scene.add(this.skyBoxMeshDay);
+        scene.add(this.skyBoxMeshNight);
     }
 
     private createFacesFromAtlas(): void{
-        const atlas = getTexture("sky.cubemapr");
+        const atlasDay = getTexture("sky.cubemapDay"); 
+        const atlasNight = getTexture("sky.cubemapNight");
 
-        atlas.wrapS = THREE.ClampToEdgeWrapping;
-        atlas.wrapT = THREE.ClampToEdgeWrapping;
+        atlasDay.wrapS = THREE.ClampToEdgeWrapping;
+        atlasDay.wrapT = THREE.ClampToEdgeWrapping;
         
+        atlasNight.wrapS = THREE.ClampToEdgeWrapping;
+        atlasNight.wrapT = THREE.ClampToEdgeWrapping;
+
         for (const cell of this.FACE_CELLS) {
-            const tex = atlas.clone();
-            tex.needsUpdate = true;
-
+            const texD = atlasDay.clone();
+            const texN = atlasNight.clone();
+            
+            texD.needsUpdate = true;
+            texN.needsUpdate = true;
+            
             // Cada cara ocupa 1/4 horizontal y 1/3 vertical del atlas
-            tex.repeat.set(1 / this.GRID_COLS, 1 / this.GRID_ROWS);
-
+            texD.repeat.set(1 / this.GRID_COLS, 1 / this.GRID_ROWS);
+            texN.repeat.set(1 / this.GRID_COLS, 1 / this.GRID_ROWS);
             // row se cuenta desde arriba, pero en UV el origen está abajo
             const { row, col } = cell;
-            tex.offset.set( col / this.GRID_COLS, 1 - (row + 1) / this.GRID_ROWS);
-
-            this.faceTextures.push(tex);
+            texD.offset.set( col / this.GRID_COLS, 1 - (row + 1) / this.GRID_ROWS);
+            texN.offset.set( col / this.GRID_COLS, 1 - (row + 1) / this.GRID_ROWS);
+            
+            this.faceTextureDay.push(texD);
+            this.faceTextureNight.push(texN);
         }
-
     }
 
-    public getMesh(): THREE.Mesh {
-        return this.skyBoxMesh;
+    public getMeshDay(): THREE.Mesh {
+        return this.skyBoxMeshDay;
     }
 
-    public animate(): void {
+    public getMeshNight(): THREE.Mesh {
+        return this.skyBoxMeshNight;
+    }
+
+    public setTime(number: number,): void {
+        this.skyBoxMeshDay.visible = number > 0? true : false;
+    }
+
+    public animate(deltaTime: number): void {
         // Rotación lenta alrededor del eje Y
-        this.skyBoxMesh.rotation.y += 0.0005;
+        this.skyBoxMeshDay.rotation.y += 0.0005;
+        this.skyBoxMeshNight.rotation.y += 0.0005;
     }
 }
