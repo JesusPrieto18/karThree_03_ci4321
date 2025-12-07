@@ -581,6 +581,21 @@ export class Kart {
   public removeProyectilFromList(index: number): void {
     this.proyectilesList.splice(index, 1);
     console.log("Proyectil removido de la lista");
+    // Actualizar HUD: el mesh ya fue removido por el proyectil, así que sincronizamos el contador
+    try {
+      // El proyectil aún no ha sido removido del parent en el momento de esta llamada,
+      // por eso calculamos el número restante como children.length - 1.
+      const remaining = Math.max(0, this.powerUpsList.children.length - 1);
+      setPowerUpCount(remaining);
+      // Si no quedan power-ups visuales después de esta eliminación, resetear tipo y flags
+      if (remaining === 0 && this.isActivatePowerUps) {
+        this.isActivatePowerUps = false;
+        this.powerUps = -1;
+        setPowerUpType("none");
+      }
+    } catch (e) {
+      console.warn('No se pudo actualizar HUD desde removeProyectilFromList', e);
+    }
   }
 
   public removeProyectilFromMap(index: number): void {
@@ -626,6 +641,13 @@ export class Kart {
     this.isActivatePowerUps = false;
     this.powerUps = -1;
     console.log("Power ups limpiados");
+    // Asegurar que el HUD refleja que no hay power-ups
+    try {
+      setPowerUpCount(0);
+      setPowerUpType("none");
+    } catch (e) {
+      console.warn('No se pudo actualizar HUD desde clearPowerUps', e);
+    }
   }
 
 
