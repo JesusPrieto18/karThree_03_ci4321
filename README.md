@@ -100,6 +100,16 @@ Se alternan con la tecla `C`.
 | **6** | Cafe Triple |
 |**Minus (-)**| Elimina el PowerUp Cargado para elegir otro |
 ---
+
+### Controles Modo Time
+
+| Tecla | Acción |
+|-------|--------|
+| **T** | Activar/Desactivar Modo tiempo |
+| **0** | Dia |
+| **1**| Noche |
+| **2** |Automatico|
+---
 ### Sistema de Puntación
 
 El sistema de puntuación para esta entrega se basa en sumar puntos cuando se carga un PowerUp. Solo se suma puntos en el instante que se adquiere el PowerUp y sin tener un PowerUp activo.

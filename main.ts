@@ -20,7 +20,7 @@ async function main() {
     createFourWalls(150,10);
     createFourWalls(20, 10, false);
     createKart();   
-    createMultiplePowerUpsRandom(20);
+    //createMultiplePowerUpsRandom(20);
     createUSB();
     //createHeartCones();
     //createConeSquare(10, 0, 0, 60, 4);

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { scene, sunLight } from './scene';
 import { skyBox } from './utils/initializers';
+import { timeMode } from './controls';
 
 export class DayNightCycle {
 
@@ -8,7 +9,8 @@ export class DayNightCycle {
     private angle: number = 0;
     private speed: number = 0.2; // Velocidad del ciclo
     private lastTime?: number;
-    
+    private isDay: number = 2; // 0: noche, 1: día, 2: automático
+
     constructor() {
 
         // Creamos una luz ambiental si no existe, para controlar el tono de la sombra
@@ -37,9 +39,23 @@ export class DayNightCycle {
 
         // 3. Calcular la fase del día (0 a 1) basándonos en la altura del sol (Y)
         // Si Y > 0 es día, si Y < 0 es noche.
-        const sunHeight = Math.sin(this.angle); 
-        
-        // 4. Ajustar Intensidades y Colores
+        const sunHeight = Math.sin(this.angle);
+
+        if (timeMode) {
+            if (this.isDay % 3 == 0){
+                this.updateSunLightColor(1); // Forzar día
+            } else if (this.isDay % 3 == 1){
+                this.updateSunLightColor(0); // Forzar noche
+
+            } else {    
+                this.updateSunLightColor(sunHeight); // Normal
+            }
+        } else {
+            this.updateSunLightColor(sunHeight);
+        }
+    }
+
+    private updateSunLightColor(sunHeight: number): void {
         if (sunHeight > 0) {
             // --- DÍA ---
             // Intensidad plena cuando está alto, tenue al atardecer
@@ -58,6 +74,10 @@ export class DayNightCycle {
             this.ambientLight.color.setHSL(0.6, 0.5, 0.1); // Azul
             this.ambientLight.intensity = 0.2; // Muy oscuro, aquí es donde brillarán los faros
         }
+    }
+
+    public changeDayTime(number: number): void {
+        this.isDay = number;
     }
 
     public getSunLightAngle(): number {

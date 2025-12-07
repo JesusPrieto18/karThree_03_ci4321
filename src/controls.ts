@@ -1,4 +1,4 @@
-import { kart } from './utils/initializers';
+import { kart, dayNightCycle } from './utils/initializers';
 import { calculateWheelRotation} from './utils/utils';
 import { camera } from './scene.ts';
 import * as THREE from 'three';
@@ -31,7 +31,8 @@ let currentCameraHeight = 2;
  */
 let cameraMode: number = 0;
 let rMode: number = 0; // 0: third-person, 1: first-person
-let godMode: boolean = false;
+export let godMode: boolean = false;
+export let timeMode: boolean = false;
 
 /**
  * setupControls - register keyboard listeners and populate the `keys` state map.
@@ -58,6 +59,13 @@ export function setupControls(): void {
     }
   });
 
+  // Toggle reverse/first-person submode when 'b' is pressed
+  window.addEventListener('keypress', e => {
+    if (e.key === 'l' || e.key === 'L') {
+      kart.switchHeadlights();
+    }
+  });
+
   // Toggle third-person submode when 'v' is pressed
   window.addEventListener('keypress', e => {
     if (e.key === 'v' || e.key === 'V') {
@@ -75,6 +83,19 @@ export function setupControls(): void {
         console.log("GodMode activado");
       }
       godMode = !godMode;
+    }
+  });
+
+  // Toggle godMode when 'g' is pressed
+  window.addEventListener('keypress', e => {
+    if (e.key === 't' || e.key === 'T') {
+      console.log("Tecla t presionada");
+      if (timeMode) {
+        console.log("timeMode desactivado");
+      } else {
+        console.log("timeMode activado");
+      }
+      timeMode = !timeMode;
     }
   });
 }
@@ -114,7 +135,10 @@ export function updateControls(): void {
   if (!keys['ArrowLeft'] && !keys['ArrowRight']) {
     kart.steeringAngle *= 0.8;
   }
-
+  // Gradually return steering to center when no left/right pressed
+  if (!keys['ArrowLeft'] && !keys['ArrowRight']) {
+    kart.steeringAngle *= 0.8;
+  }
   // Launch power-ups when space is pressed (single activation per keypress)
   if (keys[' ']) {
     kart.launchPowerUps();
@@ -133,10 +157,19 @@ export function updateControls(): void {
     if (keys['-']) { kart.clearPowerUps(); }
   }
 
+  // Time mode: set day/night cycle mode
+  if (timeMode) {
+    if (keys['0']) { dayNightCycle.changeDayTime(0); keys['0'] = false; }
+    if (keys['1']) { dayNightCycle.changeDayTime(1); keys['1'] = false; }
+    if (keys['2']) { dayNightCycle.changeDayTime(2); keys['2'] = false; }
+  }
+  
   // Move kart forward in the world according to its rotation.y and speed
   kart.getBody().position.x += Math.sin(kart.getBody().rotation.y) * kart.speed;
   kart.getBody().position.z += Math.cos(kart.getBody().rotation.y) * kart.speed;
-
+  //kart.getTarget().position.x = kart.getBody().position.x + Math.sin(kart.getBody().rotation.y) * 10;
+  //kart.getTarget().position.z = kart.getBody().position.z + Math.cos(kart.getBody().rotation.y) * 10;
+  
   // Rotate wheels visually based on translational speed.
   // Uses wheel.userData.radius if available, otherwise defaults to 0.3.
   kart.getWheelsFrontAxis().children.forEach((wheel) => {

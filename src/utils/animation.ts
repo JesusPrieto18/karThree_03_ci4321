@@ -13,6 +13,7 @@ export function animate(now: number): void {
   updateCameraRig()
   updateControls();
   kart.animatePowerUps();
+  kart.animateHeadlights();
   for (const pu of listPowerUps) {
     pu.animate();
   };

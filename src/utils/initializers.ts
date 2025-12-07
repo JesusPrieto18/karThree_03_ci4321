@@ -27,7 +27,7 @@ export let skyBox: SkyBox;
 export let listPowerUps: PowerUp[] = [];
 export let trafficCones: TrafficCone[] = []; // list of traffic cones (obstacles/decorators)
 export let decorators: any[] = []; // generic list for decorative objects
-
+export let dayNightCycle: DayNightCycle;
 /**
  * createKart - instantiate and position the player's kart.
  * Typical usage: call once during scene setup.
@@ -262,6 +262,6 @@ export function createSkyBox(): void {
 
 export function createDayNightCycle(): void {
   // DayNightCycle instance creation moved to main animation loop for deltaTime access
-  const dayNightCycle = new DayNightCycle();
+  dayNightCycle = new DayNightCycle();
   decorators.push(dayNightCycle);
 }
