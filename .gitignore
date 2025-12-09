@@ -31,6 +31,11 @@ firstVersion
 
 
 !src/textures/
+!src/textures/Sky/city2Sky.png
+!src/textures/Sky/cityNight.png
+!src/textures/Resource Boy - Cloud Textures/100.png
+!src/textures/Resource Boy - Cloud Textures/88.png
+!src/textures/Resource Boy - Cloud Textures/99.png
 !src/textures/Sky/Cubemap/Cubemap_Sky_15-512x512.png
 !src/textures/Hud/hud_atlas.png
 !src/textures/PowerUps/Bomb/metal_0074_color_1k.jpg
