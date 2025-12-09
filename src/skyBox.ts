@@ -24,11 +24,11 @@ export class SkyBox {
     constructor() {
         this.createFacesFromAtlas();
         const materialDay = this.faceTextureDay.map(tex =>
-            new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide })
+            new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide })
         );
 
         const materialNight = this.faceTextureNight.map(tex =>
-            new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide })
+            new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide })
         );
 
         const skyGeo = new THREE.BoxGeometry(1000, 1000, 1000);
