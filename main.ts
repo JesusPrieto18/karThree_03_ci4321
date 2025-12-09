@@ -2,7 +2,8 @@ import {initScene} from './src/scene.ts';
 import {createConeSquare, createFourWalls, createHeartCones, 
          createKart, createMultiplePowerUpsRandom, createPowerUp, createTrafficCone, 
          createUSB, createGround, createHollowSquare, createSkyBox,
-         createDayNightCycle} from './src/utils/initializers.ts';
+         createDayNightCycle, createRain, createCity,
+         createClouds} from './src/utils/initializers.ts';
 import { setupControls} from './src/controls.ts';
 import { animate } from './src/utils/animation.ts';
 import { preloadTexturesFromConfig} from './src/utils/textureManager.ts';   
@@ -25,6 +26,9 @@ async function main() {
     //createHeartCones();
     //createConeSquare(10, 0, 0, 60, 4);
     createConeSquare(30, 0, 0, 125, 4);
+    createRain()
+    createCity(250,100,150);
+    createClouds();
     animate(performance.now());
 };
 

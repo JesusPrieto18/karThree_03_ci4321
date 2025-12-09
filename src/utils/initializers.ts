@@ -7,6 +7,9 @@ import { Ground } from "../ground";
 import { RaceTrack } from "../raceTrack";
 import { SkyBox } from "../skyBox";
 import { DayNightCycle } from "../dayNightCycle";
+import { Rain } from "../particles/rain";
+import { City } from "../city";
+import { Clouds } from "../particles/clouds";
 
 /*
  * Initialization module - factory helpers to create scene entities.
@@ -264,4 +267,19 @@ export function createDayNightCycle(): void {
   // DayNightCycle instance creation moved to main animation loop for deltaTime access
   dayNightCycle = new DayNightCycle();
   decorators.push(dayNightCycle);
+}
+
+export function createRain(): void {
+  const rain = new Rain(30000);
+  decorators.push(rain)
+}
+
+export function createCity(width: number, height: number, depth: number): void {
+  const city = new City(width, height, depth);
+
+}
+
+export function createClouds(): void {
+  const clouds = new Clouds();
+  decorators.push(clouds);
 }
