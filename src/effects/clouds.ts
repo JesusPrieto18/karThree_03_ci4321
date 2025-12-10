@@ -2,13 +2,14 @@ import * as THREE from 'three';
 import { getTexture } from '../utils/textureManager';
 import { scene } from '../scene';
 import { lerp } from 'three/src/math/MathUtils.js';
+import { rain } from '../utils/initializers';
 
 export class Clouds {
     private group: THREE.Group;
     private group2: THREE.Group;
     private cloudTextures: THREE.MeshStandardMaterial[] = [];
     private lastTime: number | undefined = undefined;
-    
+    private isRaining: boolean = false;
     // Control de la rotación y desplazamiento (mantener las propiedades anteriores)
     private rotationSpeed: number = 0.01; 
 
@@ -17,7 +18,7 @@ export class Clouds {
     private thunderActive: boolean = false;
     private thunderDuration: number = 0; // Duración restante del evento
     private thunderWaitTime: number = 10 + Math.random() * 10; // Tiempo de espera inicial (segundos)
-    private maxFlashPower: number = 5000; // Máxima potencia individual (ajustar)
+    private maxFlashPower: number = 8000; // Máxima potencia individual (ajustar)
 
     constructor() {
         this.group = new THREE.Group();
@@ -26,7 +27,7 @@ export class Clouds {
         // ----------------------------------------------------
         // LÓGICA DE CREACIÓN DE LUCES ESTÁTICAS (NUEVO)
         // ----------------------------------------------------
-        const numLights = 8; // Número de puntos de luz para simular la descarga
+        const numLights = 12; // Número de puntos de luz para simular la descarga
 
         for (let i = 0; i < numLights; i++) {
             const flash = new THREE.PointLight( 0x0738da, 0, 800, 1.7); // Color azul claro, 0 power
@@ -151,6 +152,8 @@ export class Clouds {
             pos = pos + p*2 +5;
         }
         this.group2.rotateY(Math.PI/4);
+        this.group.visible = false;
+        this.group2.visible = false;
         scene.add(this.group, this.group2);
     }
     
@@ -160,8 +163,10 @@ export class Clouds {
         let deltaMs = deltaTime - this.lastTime;
         deltaMs = Math.min(deltaMs, 100); 
         this.lastTime = deltaTime;
-        const deltaS = deltaMs * 0.001; 
-        
+        const deltaS = deltaMs * 0.001;
+
+        if (!this.isRaining) return; // No animar nubes si no está lloviendo
+
         // 1. ROTACIÓN Y SCROLLING (Añadir la lógica de desplazamiento de la respuesta anterior)
         this.group.rotation.y += this.rotationSpeed * deltaS;
         this.group2.rotation.y += (this.rotationSpeed / 2) * deltaS; // Rota un grupo diferente
@@ -172,7 +177,7 @@ export class Clouds {
 
                 if (this.thunderWaitTime <= 0) {
                     this.thunderActive = true;
-                    this.thunderDuration = 0.4 + Math.random() * 0.8; // Flash dura entre 0.4s y 1.2s
+                    this.thunderDuration = 0.4 + Math.random() * 1.2; // Flash dura entre 0.4s y 1.2s
                 }
         }
 
@@ -205,6 +210,19 @@ export class Clouds {
                     light.power = 0;
                 });
             }
+        }
+        
+    }
+
+    public setRaining(rain?:boolean): void{
+        this.isRaining = !this.isRaining;
+
+        if(this.isRaining) {
+            this.group.visible = true;
+            this.group2.visible = true;
+        } else {
+            this.group.visible = false;
+            this.group2.visible = false;
         }
     }
 }

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { scene } from '../scene';
-import { kart } from '../utils/initializers';
+import { clouds, kart } from '../utils/initializers';
 
 export class Rain {
 
@@ -8,7 +8,8 @@ export class Rain {
     private material: THREE.PointsMaterial;
     private particles: THREE.Points;
     private count: number;
-    
+    private isRaining: boolean = false;
+
     // SoA: Estructura de Arrays
     private velocities: Float32Array; // Guardamos la velocidad Y de cada gota
 
@@ -54,11 +55,15 @@ export class Rain {
         });
 
         this.particles = new THREE.Points(this.geometry, this.material);
+        this.particles.visible = false; // Inicia invisible
         scene.add(this.particles);
     }
 
     // 4. El Loop de Animación (Donde ocurre la magia del SoA)
     public animate(deltaTime: number): void {
+        
+        if (!this.isRaining) return;
+       
         // Obtenemos acceso directo al array de posiciones en memoria
         const positions = this.geometry.attributes.position.array as Float32Array;
 
@@ -86,5 +91,17 @@ export class Rain {
 
         // ¡CRÍTICO! Decirle a Three.js que los puntos se movieron
         this.geometry.attributes.position.needsUpdate = true;
+    }
+
+    public rainingOn(): void {
+        this.isRaining = !this.isRaining;
+
+        if (this.isRaining) {
+            this.particles.visible = true;
+        } else {
+            this.particles.visible = false;
+        }
+
+        //clouds.setRaining(this.isRaining)
     }
 }
