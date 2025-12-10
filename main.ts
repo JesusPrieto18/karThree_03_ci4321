@@ -3,7 +3,8 @@ import {createConeSquare, createFourWalls, createHeartCones,
          createKart, createMultiplePowerUpsRandom, createPowerUp, createTrafficCone, 
          createUSB, createGround, createHollowSquare, createSkyBox,
          createDayNightCycle, createRain, createCity,
-         createClouds} from './src/utils/initializers.ts';
+         createClouds,
+         createStreetLight} from './src/utils/initializers.ts';
 import { setupControls} from './src/controls.ts';
 import { animate } from './src/utils/animation.ts';
 import { preloadTexturesFromConfig} from './src/utils/textureManager.ts';   
@@ -29,6 +30,7 @@ async function main() {
     createRain()
     createCity(250,100,150);
     createClouds();
+    createStreetLight();
     animate(performance.now());
 };
 

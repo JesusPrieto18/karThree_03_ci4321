@@ -1,4 +1,4 @@
-import { kart, dayNightCycle } from './utils/initializers';
+import { kart, dayNightCycle, rain, clouds } from './utils/initializers';
 import { calculateWheelRotation} from './utils/utils';
 import { camera } from './scene.ts';
 import * as THREE from 'three';
@@ -157,11 +157,13 @@ export function updateControls(): void {
     if (keys['-']) { kart.clearPowerUps(); }
   }
 
-  // Time mode: set day/night cycle mode
+  // Time mode: set day/night cycle and rain mode
   if (timeMode) {
     if (keys['0']) { dayNightCycle.changeDayTime(0); keys['0'] = false; }
     if (keys['1']) { dayNightCycle.changeDayTime(1); keys['1'] = false; }
-    if (keys['2']) { dayNightCycle.changeDayTime(2); keys['2'] = false; }
+    if (keys['2']) { dayNightCycle.changeDayTime(2); keys['2'] = false; } 
+    if (keys['3']) { rain.rainingOn(); keys['3'] = false; }
+    if (keys['4']) { clouds.setRaining(); keys['4'] = false; }
   }
   
   // Move kart forward in the world according to its rotation.y and speed

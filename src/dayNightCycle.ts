@@ -9,7 +9,8 @@ export class DayNightCycle {
     private angle: number = 0;
     private speed: number = 0.2; // Velocidad del ciclo
     private lastTime?: number;
-    private isDay: number = 2; // 0: noche, 1: día, 2: automático
+    private isDay: number = 2; // 0: noche, 1: día, 2: automático 
+    private sunHeight: number = 0;
 
     constructor() {
 
@@ -39,7 +40,7 @@ export class DayNightCycle {
 
         // 3. Calcular la fase del día (0 a 1) basándonos en la altura del sol (Y)
         // Si Y > 0 es día, si Y < 0 es noche.
-        const sunHeight = Math.sin(this.angle);
+        this.sunHeight = Math.sin(this.angle);
 
         if (timeMode) {
             if (this.isDay % 3 == 0){
@@ -48,10 +49,10 @@ export class DayNightCycle {
                 this.updateSunLightColor(0); // Forzar noche
 
             } else {    
-                this.updateSunLightColor(sunHeight); // Normal
+                this.updateSunLightColor(this.sunHeight); // Normal
             }
         } else {
-            this.updateSunLightColor(sunHeight);
+            this.updateSunLightColor(this.sunHeight);
         }
     }
 
@@ -80,7 +81,15 @@ export class DayNightCycle {
         this.isDay = number;
     }
 
+    public getIsDay(): number {
+        return this.isDay;
+    }
+
     public getSunLightAngle(): number {
         return this.angle;
+    }
+
+    public getSunHeight(): number {
+        return this.sunHeight;
     }
 }

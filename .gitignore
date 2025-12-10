@@ -28,7 +28,20 @@ firstVersion
 *.jpg
 *.png
 *.txt
+*.bin
+*.gltf
+*.jpg
+*.jpeg
 
+
+!src/imports/low_poly_street_light/license.txt
+!src/imports/low_poly_street_light/scene.gltf
+!src/imports/low_poly_street_light/scene.bin
+!src/imports/low_poly_street_light/textures/FPS_Light_baseColor.png
+!src/imports/low_poly_street_light/textures/FPS_Light_emissive.png
+!src/imports/low_poly_street_light/textures/FPS_Light_metallicRoughness.png
+!src/imports/low_poly_street_light/textures/FPS_Main_baseColor.png
+!src/imports/low_poly_street_light/textures/FPS_Main_metallicRoughness.png
 
 !src/textures/
 !src/textures/Sky/city2Sky.png

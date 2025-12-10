@@ -7,9 +7,10 @@ import { Ground } from "../ground";
 import { RaceTrack } from "../raceTrack";
 import { SkyBox } from "../skyBox";
 import { DayNightCycle } from "../dayNightCycle";
-import { Rain } from "../particles/rain";
+import { Rain } from "../effects/rain";
 import { City } from "../city";
-import { Clouds } from "../particles/clouds";
+import { Clouds } from "../effects/clouds";
+import { StreetLight } from "../streetLamp";
 
 /*
  * Initialization module - factory helpers to create scene entities.
@@ -31,6 +32,9 @@ export let listPowerUps: PowerUp[] = [];
 export let trafficCones: TrafficCone[] = []; // list of traffic cones (obstacles/decorators)
 export let decorators: any[] = []; // generic list for decorative objects
 export let dayNightCycle: DayNightCycle;
+export let rain: Rain;
+export let clouds: Clouds;
+
 /**
  * createKart - instantiate and position the player's kart.
  * Typical usage: call once during scene setup.
@@ -270,7 +274,7 @@ export function createDayNightCycle(): void {
 }
 
 export function createRain(): void {
-  const rain = new Rain(30000);
+  rain = new Rain(30000);
   decorators.push(rain)
 }
 
@@ -280,6 +284,26 @@ export function createCity(width: number, height: number, depth: number): void {
 }
 
 export function createClouds(): void {
-  const clouds = new Clouds();
+  clouds = new Clouds();
   decorators.push(clouds);
+}
+
+export function createStreetLight(): void {
+  const streetLight = new StreetLight(0,35);
+  const streetLight2 = new StreetLight(-30,35);
+  const streetLight3 = new StreetLight(30,35);
+
+  const streetLight4 = new StreetLight(0,35);
+  const streetLight5 = new StreetLight(-30,35);
+  const streetLight6 = new StreetLight(30,35);
+  streetLight4.rotateY(Math.PI);
+  streetLight5.rotateY(Math.PI);
+  streetLight6.rotateY(Math.PI);
+
+  const streetLight7 = new StreetLight(0,35);
+  const streetLight8 = new StreetLight(0,35);
+  streetLight7.rotateY(Math.PI / 2);
+  streetLight8.rotateY(-Math.PI / 2);
+  
+  decorators.push(streetLight, streetLight2, streetLight3, streetLight4, streetLight5, streetLight6, streetLight7, streetLight8);
 }
