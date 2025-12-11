@@ -10,6 +10,10 @@ export class Rain {
     private count: number;
     private isRaining: boolean = false;
 
+    // --- PROPIEDADES DE AUDIO (NUEVAS) ---
+    private listener: THREE.AudioListener = new THREE.AudioListener();
+    private rainSound: THREE.Audio | null = null;
+
     // SoA: Estructura de Arrays
     private velocities: Float32Array; // Guardamos la velocidad Y de cada gota
 
@@ -57,6 +61,18 @@ export class Rain {
         this.particles = new THREE.Points(this.geometry, this.material);
         this.particles.visible = false; // Inicia invisible
         scene.add(this.particles);
+
+        const audioLoader = new THREE.AudioLoader();
+        this.rainSound = new THREE.Audio(this.listener);
+        
+        // ¡IMPORTANTE! Reemplaza 'ruta/a/lluvia_loop.mp3' con la ruta real de tu archivo
+        audioLoader.load('src/effects/rain-01.mp3', (buffer) => {
+            this.rainSound!.setBuffer(buffer);
+            this.rainSound!.setLoop(true); // <--- BUCLE para sonido ambiental
+            this.rainSound!.setVolume(0.3); // Volumen bajo para ambiente
+
+            // NOTA: No lo reproducimos aquí, lo haremos en rainingOn()
+        });
     }
 
     // 4. El Loop de Animación (Donde ocurre la magia del SoA)
@@ -98,8 +114,16 @@ export class Rain {
 
         if (this.isRaining) {
             this.particles.visible = true;
+            // Si el sonido está cargado, lo iniciamos
+            if (this.rainSound && this.rainSound.buffer && !this.rainSound.isPlaying) {
+                this.rainSound.play();
+            }
         } else {
             this.particles.visible = false;
+            // Si el sonido está reproduciéndose, lo detenemos
+            if (this.rainSound && this.rainSound.isPlaying) {
+                this.rainSound.stop();
+            }
         }
 
         //clouds.setRaining(this.isRaining)

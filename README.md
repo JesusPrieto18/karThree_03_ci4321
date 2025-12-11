@@ -109,6 +109,8 @@ Se alternan con la tecla `C`.
 | **0** | Dia |
 | **1**| Noche |
 | **2** |Automatico|
+| **3** |Nublado|
+| **4** |Lluvia|
 ---
 ### Sistema de Puntación
 

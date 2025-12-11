@@ -19,6 +19,13 @@ export class Clouds {
     private thunderDuration: number = 0; // Duración restante del evento
     private thunderWaitTime: number = 10 + Math.random() * 10; // Tiempo de espera inicial (segundos)
     private maxFlashPower: number = 8000; // Máxima potencia individual (ajustar)
+    
+    // --- NUEVAS PROPIEDADES DE AUDIO ---
+    private listener: THREE.AudioListener = new THREE.AudioListener(); // Necesitamos pasar el listener
+    private thunderSound: THREE.Audio | null = null;
+    
+    // Bandera para evitar que se reproduzca el sonido varias veces durante un flash
+    private soundPlayedForEvent: boolean = false;
 
     constructor() {
         this.group = new THREE.Group();
@@ -155,6 +162,20 @@ export class Clouds {
         this.group.visible = false;
         this.group2.visible = false;
         scene.add(this.group, this.group2);
+        
+        // ----------------------------------------------------
+        // LÓGICA DE CARGA DE SONIDO (NUEVO)
+        // ----------------------------------------------------
+        const audioLoader = new THREE.AudioLoader();
+        this.thunderSound = new THREE.Audio(this.listener);
+        
+        // ¡IMPORTANTE! Reemplaza 'ruta/a/trueno.mp3' con la ruta real de tu archivo
+        audioLoader.load('src/effects/thunder-sound-effect.mp3', (buffer) => {
+            this.thunderSound!.setBuffer(buffer);
+            this.thunderSound!.setLoop(false); // No se repite
+            this.thunderSound!.setVolume(0.8); // Volumen
+        });
+
     }
     
     public animate(deltaTime: number): void {
@@ -178,12 +199,19 @@ export class Clouds {
                 if (this.thunderWaitTime <= 0) {
                     this.thunderActive = true;
                     this.thunderDuration = 0.4 + Math.random() * 1.2; // Flash dura entre 0.4s y 1.2s
+                    this.soundPlayedForEvent = false; // Resetear la bandera al iniciar nuevo evento
                 }
         }
 
         if (this.thunderActive) {
             // --- FASE DE FLASH/PARPADEO ---
             this.thunderDuration -= deltaS;
+
+            if (!this.soundPlayedForEvent && this.thunderSound && this.thunderSound.buffer) {
+                // El método play() solo funciona si el usuario ya ha interactuado con la página (p.ej., un clic).
+                this.thunderSound.play();
+                this.soundPlayedForEvent = true; // Marcar como reproducido para este evento
+            }
 
             if (this.thunderDuration > 0) {
                 
