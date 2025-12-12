@@ -15,22 +15,20 @@ async function main() {
     initScene();
     createSkyBox();
     createDayNightCycle();
+    createRain()
+    createCity(250,100,150);
+    createClouds();
+    createStreetLight();
     createGround();
     createHollowSquare(120, 28);
     setupControls();
     initHUD();
     createFourWalls(150,10);
     createFourWalls(20, 10, false);
+    createMultiplePowerUpsRandom(20);
     createKart();   
-    //createMultiplePowerUpsRandom(20);
     createUSB();
-    //createHeartCones();
-    //createConeSquare(10, 0, 0, 60, 4);
     createConeSquare(30, 0, 0, 125, 4);
-    createRain()
-    createCity(250,100,150);
-    createClouds();
-    createStreetLight();
     animate(performance.now());
 };
 
