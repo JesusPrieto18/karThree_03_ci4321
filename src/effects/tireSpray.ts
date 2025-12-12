@@ -62,8 +62,8 @@ export class TireSpray {
       size: 2,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.5,
-      depthWrite: false,
+      opacity: 0.9,
+      depthWrite: true,
       blending: THREE.AdditiveBlending,
     });
 
