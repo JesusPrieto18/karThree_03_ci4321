@@ -3,7 +3,7 @@ import {createConeSquare, createFourWalls, createHeartCones,
          createKart, createMultiplePowerUpsRandom, createPowerUp, createTrafficCone, 
          createUSB, createGround, createHollowSquare, createSkyBox,
          createDayNightCycle, createRain, createCity,
-         createClouds,
+         createClouds, createTireSpray,
          createStreetLight} from './src/utils/initializers.ts';
 import { setupControls} from './src/controls.ts';
 import { animate } from './src/utils/animation.ts';
@@ -22,6 +22,7 @@ async function main() {
     createFourWalls(150,10);
     createFourWalls(20, 10, false);
     createKart();   
+    createTireSpray();
     //createMultiplePowerUpsRandom(20);
     createUSB();
     //createHeartCones();
