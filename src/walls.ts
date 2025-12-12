@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { aabbIntersects, solidWithWire, resolvePenetrationKart } from './utils/utils';
 import { scene } from './scene';
+import { tireSpray } from './utils/initializers';
 import { collisionObserver } from './utils/colliding';
 import { Kart } from './kart';
 import type { CollisionClassName } from './models/colisionClass';
@@ -130,12 +131,24 @@ export class Walls {
     public isColliding(target: CollisionClassName): void {
         if (target instanceof Kart) {
             if (aabbIntersects(this.wall, target.getBody())) {
-                console.log("COLLISION WITH WALL");
-                // Resolve overlap between the kart and the wall to prevent sticking.
-                resolvePenetrationKart(target, this, 0.01);
-                // Apply a speed penalty to the kart (use decimal point, not comma)
-                target.speed *= 0.5;
-            }
+                    console.log("COLLISION WITH WALL");
+                    // Determine whether the kart hit this wall while at near-maximum speed
+                    const hitAtHighSpeed = (target.speed > 0) && (target.speed >= target.maxSpeed * 0.95);
+
+                    // Resolve overlap between the kart and the wall to prevent sticking.
+                    resolvePenetrationKart(target, this, 0.01);
+                    // Apply a speed penalty to the kart
+                    target.speed *= 0.5;
+
+                    // Notify the kart that it hit an obstacle so other systems can react (e.g. tire spray)
+                    if ((target as any).notifyObstacleCollision) (target as any).notifyObstacleCollision();
+
+                    // If the kart collided at (near) max speed, trigger a stronger tire spray burst
+                    if (hitAtHighSpeed && typeof tireSpray !== 'undefined' && tireSpray) {
+                        const intensity = Math.min(1.5, (target.speed / target.maxSpeed) * 1.5 + 0.8);
+                        tireSpray.burst(intensity);
+                    }
+                }
         }
     }
 }

@@ -24,15 +24,18 @@ export class TireSpray {
   private sizes: Float32Array;
 
   private kart: Kart;
+  // Distance behind the kart where particles spawn (meters)
+  private spawnDistance: number;
 
   private nextIndex = 0; // ring buffer index for emission
 
   private lastTime = 0;
   private visible: boolean = true;
 
-  constructor(kart: Kart, count = 600) {
+  constructor(kart: Kart, count = 600, spawnDistance = 2.2) {
     this.kart = kart;
     this.count = count;
+    this.spawnDistance = spawnDistance;
     this.geometry = new THREE.BufferGeometry();
 
     this.positions = new Float32Array(this.count * 3);
@@ -56,10 +59,10 @@ export class TireSpray {
 
     this.material = new THREE.PointsMaterial({
       color: 0x111111,
-      size: 1.5,
+      size: 2,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.9,
+      opacity: 0.5,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
     });
@@ -73,12 +76,23 @@ export class TireSpray {
     const amount = Math.min(this.count / 6, Math.round(10 + intensity * 120));
 
     for (let i = 0; i < amount; i++) {
-      const idx = this.nextIndex;
+      // Prefer reusing a dead slot to avoid overwriting still-alive particles
+      let idx = -1;
+      for (let j = 0; j < this.count; j++) {
+        const cand = (this.nextIndex + j) % this.count;
+        if (this.ages[cand] >= this.lifetimes[cand]) {
+          idx = cand;
+          break;
+        }
+      }
+      if (idx === -1) idx = this.nextIndex; // fallback: overwrite oldest
 
       // spawn position: slightly behind the kart
       const pos = this.kart.getBody().position.clone();
       const rot = this.kart.getBody().rotation.y;
-      const behind = new THREE.Vector3(-Math.sin(rot), 0, -Math.cos(rot)).multiplyScalar(1.6);
+      // Spawn a bit further behind the kart so the spray looks like it comes from the
+      // rear wheels/exhaust. Distance is configurable via constructor.
+      const behind = new THREE.Vector3(-Math.sin(rot), 0, -Math.cos(rot)).multiplyScalar(this.spawnDistance);
       pos.add(behind);
       // small random offset
       pos.x += (Math.random() - 0.5) * 0.6;
@@ -100,10 +114,11 @@ export class TireSpray {
       this.velocities[idx * 3 + 2] = vz;
 
       this.ages[idx] = 0;
-      this.lifetimes[idx] = 0.6 + Math.random() * 0.8;
-      this.sizes[idx] = 8 + Math.random() * 8 + intensity * 8;
+      // keep particles in the air longer so the spray lingers
+      this.lifetimes[idx] = 1.6 + Math.random() * 1.2; // ~1.6 - 2.8s
+      this.sizes[idx] = 10 + Math.random() * 10 + intensity * 8;
 
-      this.nextIndex = (this.nextIndex + 1) % this.count;
+      this.nextIndex = (idx + 1) % this.count;
     }
 
     // mark attributes as changed
@@ -128,23 +143,33 @@ export class TireSpray {
     for (let i = 0; i < this.count; i++) {
       if (ages[i] >= lifetimes[i]) continue;
       ages[i] += dt;
-      const t = ages[i] / lifetimes[i];
 
       // Integrate position
       positions[i * 3] += velocities[i * 3] * dt;
       positions[i * 3 + 1] += velocities[i * 3 + 1] * dt;
       positions[i * 3 + 2] += velocities[i * 3 + 2] * dt;
 
-      // gravity & drag
-      velocities[i * 3 + 1] -= 1.6 * dt; // gravity
-      velocities[i * 3] *= 0.995; // slight drag
-      velocities[i * 3 + 2] *= 0.995;
+      // gravity & drag (softer gravity so spray lingers)
+      velocities[i * 3 + 1] -= 0.9 * dt; // softer gravity
+      velocities[i * 3] *= 0.998; // less drag
+      velocities[i * 3 + 2] *= 0.998;
 
-      // sizes shrink over life
-      sizes[i] = sizes[i] * (1 - 0.6 * dt);
+      // sizes shrink more gently over life
+      sizes[i] = sizes[i] * (1 - 0.15 * dt);
 
       if (ages[i] < lifetimes[i]) anyAlive = true;
-      else sizes[i] = 0; // reset size when dead
+      else {
+        // On death, fully reset the particle data so it doesn't leave
+        // ghost positions or get re-shown in the same place later.
+        sizes[i] = 0;
+        velocities[i * 3] = 0;
+        velocities[i * 3 + 1] = 0;
+        velocities[i * 3 + 2] = 0;
+        // move off-screen (cheap cleanup)
+        positions[i * 3 + 1] = -9999;
+        this.ages[i] = 9999;
+        this.lifetimes[i] = 0;
+      }
     }
 
     // update attributes once per frame
