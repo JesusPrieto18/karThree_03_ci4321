@@ -1,12 +1,11 @@
 import { updateCameraRig, updateControls } from '../controls';
-import { scene, camera, renderer, sunLight, controls} from '../scene';
+import { scene, camera, renderer} from '../scene';
 import { collisionObserver } from './colliding';    
 import { kart, listPowerUps, decorators } from './initializers';
 import { updateHUD, renderHUD } from '../hud';
 
 export function animate(now: number): void {
 
-  //animateDir(now);
   scene.updateMatrixWorld(true);
   updateHUD(now);
   kart.updateBoost(now)

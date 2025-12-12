@@ -252,47 +252,95 @@ export function createConeSquare(
   }
 }
 
-/** createGround - convenience helper to create a Ground with default size. */
+/**
+ * createGround - Factory function for the Game World Floor.
+ * Initializes the main Ground plane with a default size of 150x150 units.
+ * This serves as the physics collider and visual base for the kart.
+ */
 export function createGround(){
   const ground = new Ground(150,150);
 }
 
-// Función para generar 4 planos unidos formando un cuadrado "sin relleno"
-export function createHollowSquare(size?: number,thickness?: number){
+/**
+ * createHollowSquare - Factory function for the Race Track.
+ * Generates the drivable area boundaries.
+ * It creates a "Hollow Square" geometry (outer walls and inner walls) 
+ * to define the circuit layout.
+ * * @param size Side length of the square track.
+ * @param thickness Width of the road (distance between inner and outer wall).
+ */
+export function createHollowSquare(size?: number, thickness?: number){
   const group = new RaceTrack(size, thickness);
 }
 
+/**
+ * createSkyBox - Environment Initializer.
+ * Instantiates the dual-mesh SkyBox (Day/Night versions) and adds it 
+ * to the `decorators` list to handle its slow rotation animation.
+ */
 export function createSkyBox(): void {
   skyBox = new SkyBox();
   decorators.push(skyBox);
 }
 
+/**
+ * createDayNightCycle - Lighting Manager Initializer.
+ * Sets up the global lighting controller (Sun orbit, ambient light color).
+ * It is added to `decorators` so its `animate(deltaTime)` method is called 
+ * every frame to update the sun's position.
+ */
 export function createDayNightCycle(): void {
-  // DayNightCycle instance creation moved to main animation loop for deltaTime access
   dayNightCycle = new DayNightCycle();
   decorators.push(dayNightCycle);
 }
 
+/**
+ * createRain - Weather System Initializer.
+ * Instantiates the Rain particle system with a high particle count (30,000)
+ * for a dense storm effect. Registered to `decorators` to animate the falling drops.
+ */
 export function createRain(): void {
   rain = new Rain(30000);
   decorators.push(rain)
 }
 
+/**
+ * createCity - Scenery Initializer.
+ * Constructs the surrounding city skyline walls to enclose the game world.
+ * * @param width Width of the city perimeter.
+ * @param height Height of the building textures.
+ * @param depth Depth (Z-axis) of the city perimeter.
+ */
 export function createCity(width: number, height: number, depth: number): void {
   const city = new City(width, height, depth);
-
 }
 
+/**
+ * createClouds - Atmosphere Initializer.
+ * Creates the dynamic cloud layer, including the lightning/thunder system.
+ * Added to `decorators` to handle cloud scrolling, rotation, and lightning flashes.
+ */
 export function createClouds(): void {
   clouds = new Clouds();
   decorators.push(clouds);
 }
 
+/**
+ * createStreetLight - Prop Placement Utility.
+ * Procedurally instantiates and places multiple Street Light objects around the map.
+ * * Responsibilities:
+ * 1. Instantiation: Creates lights at specific coordinates.
+ * 2. Orientation: Rotates lights (using `rotateY`) to face the correct road sections.
+ * 3. Registration: Adds all lights to the `decorators` list so they can react 
+ * to the Day/Night cycle (turning on/off automatically).
+ */
 export function createStreetLight(): void {
+  // North/South Lights
   const streetLight = new StreetLight(0,35);
   const streetLight2 = new StreetLight(-30,35);
   const streetLight3 = new StreetLight(30,35);
 
+  // Opposing/Rotated Lights
   const streetLight4 = new StreetLight(0,35);
   const streetLight5 = new StreetLight(-30,35);
   const streetLight6 = new StreetLight(30,35);
@@ -300,10 +348,12 @@ export function createStreetLight(): void {
   streetLight5.rotateY(Math.PI);
   streetLight6.rotateY(Math.PI);
 
+  // Side Lights
   const streetLight7 = new StreetLight(0,35);
   const streetLight8 = new StreetLight(0,35);
   streetLight7.rotateY(Math.PI / 2);
   streetLight8.rotateY(-Math.PI / 2);
   
+  // Register all lights for updates
   decorators.push(streetLight, streetLight2, streetLight3, streetLight4, streetLight5, streetLight6, streetLight7, streetLight8);
 }

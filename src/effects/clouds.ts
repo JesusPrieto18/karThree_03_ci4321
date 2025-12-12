@@ -2,63 +2,76 @@ import * as THREE from 'three';
 import { getTexture } from '../utils/textureManager';
 import { scene } from '../scene';
 import { lerp } from 'three/src/math/MathUtils.js';
-import { rain } from '../utils/initializers';
 
+/**
+ * Clouds - Dynamic Weather & Storm Manager.
+ * * Orchestrates the visual and audio elements of a thunderstorm.
+ * * Manages rotating cloud layers and a procedural lightning system using scattered PointLights.
+ */
 export class Clouds {
-    private group: THREE.Group;
-    private group2: THREE.Group;
-    private cloudTextures: THREE.MeshStandardMaterial[] = [];
-    private lastTime: number | undefined = undefined;
-    private isRaining: boolean = false;
-    // Control de la rotación y desplazamiento (mantener las propiedades anteriores)
-    private rotationSpeed: number = 0.01; 
+    // --- Visual Layers ---
+    private group: THREE.Group;  // Primary cloud layer
+    private group2: THREE.Group; // Secondary cloud layer (for parallax depth)
+    private cloudTextures: THREE.MeshStandardMaterial[] = []; // Stores materials for potential reuse/updates
 
-    // --- NUEVAS PROPIEDADES PARA EL TRUENO ---
-    private flashLights: THREE.PointLight[] = []; // Array para guardar todas las luces estáticas
-    private thunderActive: boolean = false;
-    private thunderDuration: number = 0; // Duración restante del evento
-    private thunderWaitTime: number = 10 + Math.random() * 10; // Tiempo de espera inicial (segundos)
-    private maxFlashPower: number = 8000; // Máxima potencia individual (ajustar)
-    
-    // --- NUEVAS PROPIEDADES DE AUDIO ---
-    private listener: THREE.AudioListener = new THREE.AudioListener(); // Necesitamos pasar el listener
+    // --- Animation State ---
+    private lastTime: number | undefined = undefined; // Timestamp helper for delta time
+    private isRaining: boolean = false; // Master toggle for the entire system
+    private rotationSpeed: number = 0.01; // Base rotation speed for the cloud ring
+
+    // --- Lightning System Properties ---
+    private flashLights: THREE.PointLight[] = []; // Pool of 12 invisible lights used for lightning
+    private thunderActive: boolean = false;       // State flag: Is a flash sequence currently happening?
+    private thunderDuration: number = 0;          // Time remaining in the current flash sequence
+    private thunderWaitTime: number = 10 + Math.random() * 10; // Countdown timer to the next random event
+    private maxFlashPower: number = 8000;         // Peak intensity for the lightning lights
+
+    // --- Audio Properties ---
+    // Listener usually comes from the camera, but a new one is instantiated here as per implementation
+    private listener: THREE.AudioListener = new THREE.AudioListener(); 
     private thunderSound: THREE.Audio | null = null;
     
-    // Bandera para evitar que se reproduzca el sonido varias veces durante un flash
+    // Flag to ensure the sound effect triggers exactly once per lightning event
     private soundPlayedForEvent: boolean = false;
 
+    /**
+     * Constructor: Initializes the 3D cloud structure, the lightning light pool, and loads audio.
+     */
     constructor() {
         this.group = new THREE.Group();
         this.group2 = new THREE.Group();
 
-        // ----------------------------------------------------
-        // LÓGICA DE CREACIÓN DE LUCES ESTÁTICAS (NUEVO)
-        // ----------------------------------------------------
-        const numLights = 12; // Número de puntos de luz para simular la descarga
+        // 1. LIGHTNING POOL INITIALIZATION
+        const numLights = 12; // Number of distinct flash points
 
         for (let i = 0; i < numLights; i++) {
-            const flash = new THREE.PointLight( 0x0738da, 0, 800, 1.7); // Color azul claro, 0 power
+            // Create a blue-ish PointLight (Distance 800, Decay 1.7)
+            const flash = new THREE.PointLight( 0x0738da, 0, 800, 1.7); 
             
-            // Posicionamiento aleatorio en una caja grande encima de las nubes
+            // Randomly position the light within a volume above the player/track
             flash.position.set(
-                (Math.random() - 0.5) * 500, // Rango X: -250 a 250
-                40 + Math.random() * 10,    // Rango Y: 40 a 50 (encima de las nubes)
-                (Math.random() - 0.5) * 500  // Rango Z: -250 a 250
+                (Math.random() - 0.5) * 500, // X spread
+                40 + Math.random() * 10,     // Y Height (just above cloud meshes)
+                (Math.random() - 0.5) * 500  // Z spread
             );
-            flash.power = 0; // Inicia apagada
+            flash.power = 0; // Start dormant (invisible)
+            
             this.flashLights.push(flash);
-            this.group.add(flash); // Añadir al grupo de rotación si quieres que roten con las nubes
+            this.group.add(flash); // Add to group so lights rotate with the storm system
         }
 
-        //scene.add(flashHelper);
-        //300,100,300
-        // Material y geometría base
+        // 2. CLOUD MESH GENERATION
+        // Load textures via manager
         const texture = getTexture("clouds.texture");
         const texture2 = getTexture("clouds2.texture");
         const texture3 = getTexture("clouds3.texture");
 
+        // Define geometries for cloud planes
         const cloudGeo = new THREE.PlaneGeometry(500,200);
         const cloudGeo2 = new THREE.PlaneGeometry(400,200);
+        
+        // Define materials (Standard Material reacts to scene lighting)
+        // depthWrite: false is CRITICAL for transparent objects to render without occlusion artifacts
         const cloudMaterial = new THREE.MeshStandardMaterial({
             map: texture,
             transparent: true,
@@ -71,7 +84,6 @@ export class Clouds {
             side: THREE.DoubleSide,
             depthWrite: false
         });
-
         const cloudMaterial3 = new THREE.MeshStandardMaterial({
             map: texture3,
             transparent: true,
@@ -80,175 +92,166 @@ export class Clouds {
         });
 
         this.cloudTextures.push(cloudMaterial, cloudMaterial2, cloudMaterial3); 
+        
+        // Procedural Generation Loop
+        // Creates a ring/wall of cloud planes around the center
         let pos = 200;
         for(let p=0; p<12; p++) {
-
             let cloud = new THREE.Mesh(cloudGeo, this.cloudTextures[p % 3]);
             let cloud2 = new THREE.Mesh(cloudGeo, this.cloudTextures[p % 3]);
             let cloud3 = new THREE.Mesh(cloudGeo2, this.cloudTextures[p % 3]);
             let cloud4 = new THREE.Mesh(cloudGeo2, this.cloudTextures[p % 3]);
-            if (p %2 ==0) {
-                cloud.position.set(
-                    0,//lerp(-30, 30, Math.random()) + p, //Math.random()*800 -400,
-                    50, //lerp(50, 75, Math.random()),//100/2,
-                    lerp(pos, pos+p*2+1, Math.random()) + p*2//Math.random()*150
-                );
+            
+            if (p % 2 == 0) {
+                // Configuration for Even indices (Outer Ring)
+                cloud.position.set(0, 50, lerp(pos, pos+p*2+1, Math.random()) + p*2);
                 cloud.material.opacity = 0.6;
 
-                cloud2.position.set(
-                    0,//lerp(-30, 30, Math.random()) + p, //Math.random()*800 -400,
-                    50,//lerp(50, 75, Math.random()),//100/2,
-                    lerp(-pos, -(pos+p*2+1), Math.random())- p*2//Math.random()*150
-                );
+                cloud2.position.set(0, 50, lerp(-pos, -(pos+p*2+1), Math.random())- p*2);
                 cloud2.material.opacity = 0.6;
                 
                 cloud3.rotation.y = Math.PI/2;
-                cloud3.position.set(
-                    lerp(pos, pos+p*2+1, Math.random()) + p*2, //Math.random()*800 -400,
-                    40,//lerp(40, 65, Math.random()),//100/2,
-                    0,//lerp(-15, 15, Math.random())+ p//Math.random()*150
-                );
+                cloud3.position.set(lerp(pos, pos+p*2+1, Math.random()) + p*2, 40, 0);
                 cloud3.material.opacity = 0.6;
                 
                 cloud4.rotation.y = Math.PI/2;
-                cloud4.position.set(
-                    lerp(-pos, -(pos+p*2+1), Math.random()) - p*2 , //Math.random()*800 -400,
-                    40,//lerp(40, 65, Math.random()),//100/2,
-                    0,//lerp(-15, 15, Math.random())+ p//Math.random()*150
-                );
+                cloud4.position.set(lerp(-pos, -(pos+p*2+1), Math.random()) - p*2, 40, 0);
                 cloud4.material.opacity = 0.6;
 
                 this.group.add(cloud, cloud2, cloud3, cloud4)
             } else {
-                cloud.position.set(
-                    0,//lerp(-30, 30, Math.random()) + p, //Math.random()*800 -400,
-                    50, //lerp(50, 75, Math.random()),//100/2,
-                    200 + p*2//Math.random()*150
-                );
+                // Configuration for Odd indices (Inner Ring/Variation)
+                cloud.position.set(0, 50, 200 + p*2);
                 cloud.material.opacity = 0.6;
 
-                cloud2.position.set(
-                    0,//lerp(-30, 30, Math.random()) + p, //Math.random()*800 -400,
-                    50,//lerp(50, 75, Math.random()),//100/2,
-                    -200 - p*2//Math.random()*150
-                );
+                cloud2.position.set(0, 50, -200 - p*2);
                 cloud2.material.opacity = 0.6;
                 
                 cloud3.rotation.y = Math.PI/2;
-                cloud3.position.set(
-                    200 + p*2, //Math.random()*800 -400,
-                    40,//lerp(40, 65, Math.random()),//100/2,
-                    0,//lerp(-15, 15, Math.random())+ p//Math.random()*150
-                );
+                cloud3.position.set(200 + p*2, 40, 0);
                 cloud3.material.opacity = 0.6;
                 
                 cloud4.rotation.y = Math.PI/2;
-                cloud4.position.set(
-                    -200 - p*2 , //Math.random()*800 -400,
-                    40,//lerp(40, 65, Math.random()),//100/2,
-                    0,//lerp(-15, 15, Math.random())+ p//Math.random()*150
-                );
+                cloud4.position.set(-200 - p*2, 40, 0);
                 cloud4.material.opacity = 0.6;
+                
+                // Scale variations for inner clouds
                 cloud.scale.set(0.4,0.4,0.4);
                 cloud2.scale.set(0.4,0.4,0.4);
                 cloud3.scale.set(0.3,0.3,0.3);
                 cloud4.scale.set(0.3,0.3,0.3);
+
                 this.group2.add(cloud, cloud2, cloud3, cloud4)
             };
             
             pos = pos + p*2 +5;
         }
+
+        // Rotate secondary group for visual variety
         this.group2.rotateY(Math.PI/4);
+        
+        // Hide on start (requires manual activation via setRaining)
         this.group.visible = false;
         this.group2.visible = false;
         scene.add(this.group, this.group2);
         
-        // ----------------------------------------------------
-        // LÓGICA DE CARGA DE SONIDO (NUEVO)
-        // ----------------------------------------------------
+        // 3. AUDIO SYSTEM INITIALIZATION
         const audioLoader = new THREE.AudioLoader();
         this.thunderSound = new THREE.Audio(this.listener);
         
-        // ¡IMPORTANTE! Reemplaza 'ruta/a/trueno.mp3' con la ruta real de tu archivo
+        // Load the thunder sound file asynchronously
         audioLoader.load('src/effects/thunder-sound-effect.mp3', (buffer) => {
             this.thunderSound!.setBuffer(buffer);
-            this.thunderSound!.setLoop(false); // No se repite
-            this.thunderSound!.setVolume(0.8); // Volumen
+            this.thunderSound!.setLoop(false); // Play once per event
+            this.thunderSound!.setVolume(0.8); // High volume for impact
         });
 
     }
     
+    /**
+     * Main Animation Loop. Called every frame by the game engine.
+     * Handles rotation physics and the Thunder State Machine.
+     * @param deltaTime Timestamp in milliseconds.
+     */
     public animate(deltaTime: number): void {
-        // Cálculo de deltaS (su lógica, la cual es CORRECTA)
+        // --- Delta Time Calculation ---
         if (this.lastTime === undefined) this.lastTime = deltaTime;
         let deltaMs = deltaTime - this.lastTime;
-        deltaMs = Math.min(deltaMs, 100); 
+        deltaMs = Math.min(deltaMs, 100); // Clamp to avoid large jumps
         this.lastTime = deltaTime;
-        const deltaS = deltaMs * 0.001;
+        const deltaS = deltaMs * 0.001; // Convert to seconds
 
-        if (!this.isRaining) return; // No animar nubes si no está lloviendo
+        // Optimization: Exit immediately if weather system is inactive
+        if (!this.isRaining) return; 
 
-        // 1. ROTACIÓN Y SCROLLING (Añadir la lógica de desplazamiento de la respuesta anterior)
+        // 1. CLOUD ROTATION PHYSICS
+        // Rotate the two cloud groups at different speeds to create a parallax effect
         this.group.rotation.y += this.rotationSpeed * deltaS;
-        this.group2.rotation.y += (this.rotationSpeed / 2) * deltaS; // Rota un grupo diferente
+        this.group2.rotation.y += (this.rotationSpeed / 2) * deltaS; 
     
+        // 2. THUNDER STATE MACHINE
+        
+        // STATE: WAITING (Cooldown phase)
         if (!this.thunderActive) {
-                // --- FASE DE ESPERA ---
                 this.thunderWaitTime -= deltaS;
 
                 if (this.thunderWaitTime <= 0) {
+                    // Trigger new lightning event
                     this.thunderActive = true;
-                    this.thunderDuration = 0.4 + Math.random() * 1.2; // Flash dura entre 0.4s y 1.2s
-                    this.soundPlayedForEvent = false; // Resetear la bandera al iniciar nuevo evento
+                    // Random duration for the storm surge (0.4s to 1.6s)
+                    this.thunderDuration = 0.4 + Math.random() * 1.2; 
+                    this.soundPlayedForEvent = false; // Reset audio flag
                 }
         }
 
+        // STATE: ACTIVE (Flashing phase)
         if (this.thunderActive) {
-            // --- FASE DE FLASH/PARPADEO ---
             this.thunderDuration -= deltaS;
 
+            // Trigger Audio (Once per event start)
             if (!this.soundPlayedForEvent && this.thunderSound && this.thunderSound.buffer) {
-                // El método play() solo funciona si el usuario ya ha interactuado con la página (p.ej., un clic).
                 this.thunderSound.play();
-                this.soundPlayedForEvent = true; // Marcar como reproducido para este evento
+                this.soundPlayedForEvent = true; 
             }
 
             if (this.thunderDuration > 0) {
-                
-                // 1. Efecto Parpadeo Erático
+                // STROBE EFFECT: Randomly modulate light intensity
                 this.flashLights.forEach(light => {
-                    // Hay 30% de probabilidad de que una luz individual parpadee en este frame
+                    // 30% chance per frame for a light to "spike" in brightness
                     if (Math.random() > 0.7) {
-                        // La luz se activa con una potencia aleatoria, creando picos irregulares
                         light.power = this.maxFlashPower * (0.5 + Math.random() * 0.5); 
                     }
                     
-                    // 2. Desvanecimiento: Todas las luces se atenúan rápidamente
-                    // Usamos lerp para forzar el apagado en cada frame
+                    // DECAY: Fade out light rapidly using linear interpolation
                     light.power = lerp(light.power, 0, deltaS * 30); 
                 });
                 
             } else {
-                // --- FIN DEL EVENTO ---
+                // END EVENT: Reset state
                 this.thunderActive = false;
-                this.thunderWaitTime = 5 + Math.random() * 15; // Próximo trueno en 5 a 20 segundos
+                this.thunderWaitTime = 5 + Math.random() * 15; // Set new random cooldown (5-20s)
                 
-                // Asegurarse de que todas las luces estén completamente apagadas
+                // Ensure complete blackout of lightning lights
                 this.flashLights.forEach(light => {
                     light.power = 0;
                 });
             }
         }
-        
     }
 
+    /**
+     * Toggles the active state of the storm system.
+     * @param rain Optional boolean to force state. If undefined, toggles current state.
+     */
     public setRaining(rain?:boolean): void{
         this.isRaining = !this.isRaining;
 
         if(this.isRaining) {
+            // Show clouds
             this.group.visible = true;
             this.group2.visible = true;
         } else {
+            // Hide clouds and disable effects
             this.group.visible = false;
             this.group2.visible = false;
         }
