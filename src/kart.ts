@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { scene } from './scene';
-import {solidWithWire, reflectDirection, disposeMesh } from './utils/utils';
+import {solidWithWire, disposeMesh } from './utils/utils';
 import { Shuriken } from './shuriken';
-import type {Proyectils, StaticObjects } from './models/colisionClass';
+import type {Proyectils} from './models/colisionClass';
 import { collisionObserver } from './utils/colliding';
 import { Coffee } from './coffee';
 import { Bomb } from './bomb';
@@ -736,8 +736,6 @@ export class Kart {
     this.headlightsR.target = this.target;
     this.headlightsL.target = this.target;
     this.helperR.update();
-    //console.log(this.target.position);
-    //this.headlightsL.lookAt(this.kart.position.clone().add(direction));
   }
 
   public switchHeadlights(): void {

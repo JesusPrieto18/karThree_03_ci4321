@@ -36,35 +36,7 @@ export function initScene(): void {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // 3) Load environment HDR with HDRLoader ---
-
-  const hdrLoader = new HDRLoader();
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  pmrem.compileEquirectangularShader();
-  /** 
-  hdrLoader.load(
-    'src\\textures\\Sky\\autumn_hill_view_1k.hdr',
-    (hdrTex) => {
-      hdrTex.mapping = THREE.EquirectangularReflectionMapping;
-
-      const envRT = pmrem.fromEquirectangular(hdrTex);
-      const envMap = envRT.texture;
-
-      scene.environment = envMap;
-      // si NO quieres el HDR como fondo:
-      // scene.background = null;
-      // si SÍ lo quieres también de fondo:
-      // scene.background = envMap;
-
-      hdrTex.dispose();
-      pmrem.dispose();
-    },
-    undefined,
-    (err) => {
-      console.error('Error al cargar HDR:', err);
-    }
-  );*/
-  // 4) Camera - perspective camera positioned above and behind the origin
+  // 3) Camera - perspective camera positioned above and behind the origin
   camera = new THREE.PerspectiveCamera(
     75,                                  // field of view in degrees
     window.innerWidth / window.innerHeight, // aspect ratio
@@ -75,34 +47,27 @@ export function initScene(): void {
 
 
 
-  // 5) Lights - directional light to simulate sunlight
+  // 4) Lights - directional light to simulate sunlight
   sunLight = new THREE.DirectionalLight(0xffffff, 5);
   sunLight.position.set(100, 30, 0);
-  //dir.castShadow = true; // toggle shadows if needed
   sunLight.intensity = 4;
   scene.add(sunLight);
 
-  // Optional helper to visualize the directional light (disabled by default)
-  const dirHelper = new THREE.DirectionalLightHelper(sunLight, 2, 0xff0000);
-  //scene.add(dirHelper);
-
-  // 6) Helpers - axes and grid help during development and debugging
+  // 5) Helpers - axes and grid help during development and debugging
   //scene.add(new THREE.AxesHelper(20));
   //scene.add(new THREE.GridHelper(20, 20));
 
-  // 7) Controls - OrbitControls creation is optional; left commented intentionally.
+  // 6) Controls - OrbitControls creation is optional; left commented intentionally.
   controls = createCameraControls(camera, renderer);
   //controls.enableDamping = true;
 
-  // 8) Resize handler - keeps camera aspect and renderer size correct on window resize
+  // 7) Resize handler - keeps camera aspect and renderer size correct on window resize
   window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  //renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  // Reduce la exposición para atenuar el efecto general del HDR
   renderer.toneMappingExposure = 0.01;
   renderer.shadowMap.enabled = true;
 }

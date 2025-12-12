@@ -19,18 +19,6 @@ import { getTexture } from './utils/textureManager';
  *  - color: base color of the track surface.
  */
 
-/**
- * Ground
- *
- * Encapsulates a ground plane.
- * - Adds itself to the global scene.
- * - Registers with the global collision observer so collisions with projectiles
- *   or other objects can be detected.
- *
- * Constructor parameters:
- *  - width / length: size of the track plane.
- *  - color: base color of the track surface.
- */
 export class RaceTrack {
   private group = new THREE.Group();
 

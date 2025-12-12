@@ -155,9 +155,17 @@ export class Shuriken {
   public moveX(delta: number): void {
     this.mesh.position.x += delta;
   }
+
+  /**
+   * Small movement helpers to adjust the mesh position directly.
+   */
   public moveY(delta: number): void {
     this.mesh.position.y += delta;
   }
+
+  /**
+   * Small movement helpers to adjust the mesh position directly.
+   */
   public moveZ(delta: number): void {
     this.mesh.position.z += delta;
   }
