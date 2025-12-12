@@ -148,10 +148,10 @@ Archivos principales de la arquitectura del proyecto.
 |── node_modules
 src/
 │
-├── effects
+├── effects #Se implementa los diferentes sistemas de partículas del juego. 
     ├── clouds.ts 
-    ├── rain.tx
-    ├── tireSpray #Implementación del sistema de particulas que crea el efecto.  
+    ├── rain.ts 
+    ├── tireSpray.ts #Implementación del sistema de particulas que crea el efecto.  
 ├──
 ├── models/
 ├── textures/
@@ -166,14 +166,17 @@ src/
 │ ├── box.ts # Genera cajas u obstáculos simples en la pista
 │ ├── coffee.ts # Power-up tipo “café” que otorga velocidad
 │ ├── controls.ts # Manejo de teclas y controles del jugador (movimiento, disparo, cámara)
-│ ├── Ground.ts 
+| ├── dayNightCycle.ts
+│ ├── ground.ts 
 │ ├── hud.ts # Interfaz 2D implementando Sprite Atlas
 │ ├── kart.ts # Clase principal del Kart (posición, rotación, animación, lanzamiento de power-ups)
 │ ├── powerUps.ts # Manejo de objetos recogibles y su lógica (activar, girar, lanzar)
-│ ├── RaceTrack.ts # Clase RaceTrack → encapsula la pista y sus interacciones (colisiones, suelo)
+│ ├── raceTrack.ts # Clase RaceTrack → encapsula la pista y sus interacciones (colisiones, suelo)
 │ ├── scene.ts # Configura la escena principal de Three.js (luz, cámara, render)
 │ ├── shuriken.ts # Clase Shuriken → proyectil giratorio
 │ ├── shurikenInfo.ts # Datos de geometría (vértices y colores) del shuriken
+| ├── skyBox.ts #Se encuentra la lógica de la técnica SkyBox para mostrar los detalles del escenario
+| ├── streetLamp.ts #Código para las lámparas. 
 │ ├── trafficCone.ts # Clase TrafficCone → obstáculo tipo cono con colisión
 │ ├── usb.ts #Objeto para el Modelo de USB siglas
 │ ├── walls.ts # Clase Walls → muros y límites de la pista
