@@ -281,7 +281,7 @@ export function createRain(): void {
 }
 
 export function createTireSpray(): void {
-  tireSpray = new TireSpray(kart, 600);
+  tireSpray = new TireSpray(kart, 1000);
   decorators.push(tireSpray);
 }
 

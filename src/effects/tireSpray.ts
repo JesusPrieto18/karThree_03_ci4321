@@ -23,12 +23,15 @@ export class TireSpray {
   private lifetimes: Float32Array;
   private sizes: Float32Array;
 
+  private kart: Kart;
+
   private nextIndex = 0; // ring buffer index for emission
 
   private lastTime = 0;
   private visible: boolean = true;
 
-  constructor(private kart: Kart, count = 600) {
+  constructor(kart: Kart, count = 600) {
+    this.kart = kart;
     this.count = count;
     this.geometry = new THREE.BufferGeometry();
 
