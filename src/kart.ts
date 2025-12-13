@@ -36,7 +36,6 @@ export class Kart {
   private headlightsR: THREE.SpotLight;
   private headlightsL: THREE.SpotLight;
   private target: THREE.Object3D | THREE.Mesh;
-  private helperR: THREE.SpotLightHelper;
   private switchLights: boolean = false;
 
   // Movement state (public for easy access from controls)
@@ -109,7 +108,6 @@ export class Kart {
     mesh_capo.position.set(0,1.1,-0.7);
     this.kartChassis.add(mesh_capo);
 
-    //this.kartChassis.add(new THREE.AxesHelper(20));
     
     let tope = new THREE.BoxGeometry(0.6,0.2,1);
     let material_tope = new THREE.MeshStandardMaterial({color:material_color, map: yellowTexture, normalMap: yellowTextureNormal, roughness: 0.3, metalness: 0.8});
@@ -160,18 +158,11 @@ export class Kart {
     this.kartChassis.add(mesh_luces_delanteras);
     
     this.target = new THREE.Object3D();
-    //this.target = new THREE.Mesh(new THREE.BoxGeometry(5,5,5), new THREE.MeshBasicMaterial({color:0xff0000}));
-    //this.target.position.copy(this.kartChassis.position);
-    //this.target.position.z -= 10;
     scene.add(this.target);
     
     this.headlightsR = new THREE.SpotLight(0xffffff, 0, 30, 0.5, 0.5, 0.1);
     this.headlightsR.position.set (-0.5,0.6,2.21)
-    //this.headlightsR.target = this.target;
     this.kartChassis.add(this.headlightsR);
-    this.helperR = new THREE.SpotLightHelper(this.headlightsR);
-    this.kartChassis.add(this.helperR);
-    //this.kartChassis.add(this.target);
 
     let mesh_luces_delanteras2 = new THREE.Mesh(luces_delanteras, material_luces_delanteras);
     mesh_luces_delanteras2.position.set(0.5,0.6,2.21);
@@ -180,7 +171,6 @@ export class Kart {
     this.headlightsL = new THREE.SpotLight(0xffffff, 0, 30, 0.5, 0.5, 0.1);
     this.headlightsL.position.set (0.5,0.6,2.21)
     this.kartChassis.add(this.headlightsL);
-    //this.kartChassis.add(new THREE.SpotLightHelper(this.headlightsL));
 
     const ventanaTexture = getTexture("kar.windowTexture");
     const ventanaTextureNormal = getTexture("kar.windowNormal");
@@ -226,7 +216,7 @@ export class Kart {
     // Assemble kart group and add helper axes for debugging
     this.kart.add(this.kartChassis);
     this.kart.position.set(0, 0.7,-3);
-    this.kart.add(new THREE.AxesHelper(3));
+
 
     // Wheels and axes setup
     this.wheelAxisGroup = new THREE.Group();
@@ -802,7 +792,6 @@ export class Kart {
     this.target.position.z = this.kart.position.z + Math.cos(this.kart.rotation.y) * 10;
     this.headlightsR.target = this.target;
     this.headlightsL.target = this.target;
-    this.helperR.update();
   }
 
   public switchHeadlights(): void {
