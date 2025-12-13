@@ -150,6 +150,7 @@ Archivos principales de la arquitectura del proyecto.
 │   ├── effects/                 # Efectos visuales y ambientales
 │   │   ├── clouds.ts            # Lógica y renderizado de nubes animadas
 │   │   ├── rain.ts              # Lógica y renderizado de lluvia
+        ├── tireSpray.ts         # Lógica del efecto tireSpray
 │   ├── imports/                 # Modelos y texturas importados de terceros
 │   │   ├── low_poly_street_light/           # Faroles low poly
 │   ├── models/                  # Clases base y de colisión
