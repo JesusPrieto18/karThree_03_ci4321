@@ -11,13 +11,14 @@ export function animate(now: number): void {
   kart.updateBoost(now)
   updateCameraRig()
   updateControls();
-  kart.animatePowerUps();
-  kart.animateHeadlights();
+  try { kart.animatePowerUps(); } catch (e) { console.error('Error animating kart powerUps', e); }
+  try { kart.animateHeadlights(); } catch (e) { console.error('Error animating kart headlights', e); }
   for (const pu of listPowerUps) {
-    pu.animate();
+    try { pu.animate(); } catch (e) { console.error('Error animating powerUp', e); }
   };
   for (const dec of decorators) {
-    dec.animate(now);
+    try { if (dec && typeof dec.animate === 'function') dec.animate(now); }
+    catch (e) { console.error('Error animating decorator', e); }
   }
   collisionObserver.checkCollision();
   requestAnimationFrame(animate);

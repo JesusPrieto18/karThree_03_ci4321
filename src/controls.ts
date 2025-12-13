@@ -1,4 +1,4 @@
-import { kart, dayNightCycle, rain, clouds } from './utils/initializers';
+import { kart, dayNightCycle, rain, clouds, tireSpray } from './utils/initializers';
 import { calculateWheelRotation} from './utils/utils';
 import { camera } from './scene.ts';
 import * as THREE from 'three';
@@ -116,6 +116,26 @@ export function updateControls(): void {
   if (keys['ArrowUp']) kart.speed = Math.min(kart.maxSpeed, kart.speed + 0.005);
   if (!keys['ArrowUp'] && !keys['ArrowDown']) kart.speed *= 0.95;
   updateVelocity(kart.speed, kart.maxSpeed);
+
+  // Detect sudden acceleration to trigger tire spray
+  // Use a simple finite-difference between frames
+  if (typeof (updateControls as any).__prevSpeed === 'undefined') (updateControls as any).__prevSpeed = kart.speed;
+  const prevSpeed = (updateControls as any).__prevSpeed as number;
+  const accel = kart.speed - prevSpeed;
+  // threshold tuned experimentally: accel > 0.02 considered a violent acceleration
+  // Also trigger when accelerating while contacting an obstacle (wall / cone)
+  const accelThreshold = 0.02;
+  const isAccelerating = keys['ArrowUp'];
+  const hittingObstacle = (kart as any).hasRecentObstacleContact ? (kart as any).hasRecentObstacleContact(300) : false;
+  if (isAccelerating && (accel > accelThreshold || hittingObstacle) && tireSpray) {
+    // normalize intensity (0..1.5). If the kart is pushing against an obstacle
+    // but not actually changing speed, use a reasonable default intensity.
+    let intensity: number;
+    if (accel > accelThreshold) intensity = Math.min(1.5, accel / 0.05);
+    else intensity = 0.9;
+    tireSpray.burst(intensity);
+  }
+  (updateControls as any).__prevSpeed = kart.speed;
 
   // Steering: adjust steeringAngle and rotate kart body when moving
   if (keys['ArrowRight']) {

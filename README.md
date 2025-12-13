@@ -142,6 +142,7 @@ El proyecto usa un **Collision Observer** central que mantiene una lista de obje
 
 ---
 ## Arquitectura
+Archivos principales de la arquitectura del proyecto. 
 
 ```bash
 |── node_modules/                # Dependencias instaladas por npm

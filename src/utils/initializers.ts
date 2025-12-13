@@ -8,6 +8,7 @@ import { RaceTrack } from "../raceTrack";
 import { SkyBox } from "../skyBox";
 import { DayNightCycle } from "../dayNightCycle";
 import { Rain } from "../effects/rain";
+import { TireSpray } from "../effects/tireSpray";
 import { City } from "../city";
 import { Clouds } from "../effects/clouds";
 import { StreetLight } from "../streetLamp";
@@ -34,6 +35,7 @@ export let decorators: any[] = []; // generic list for decorative objects
 export let dayNightCycle: DayNightCycle;
 export let rain: Rain;
 export let clouds: Clouds;
+export let tireSpray: TireSpray;
 
 /**
  * createKart - instantiate and position the player's kart.
@@ -304,6 +306,10 @@ export function createRain(): void {
   decorators.push(rain)
 }
 
+export function createTireSpray(): void {
+  tireSpray = new TireSpray(kart, 1000);
+  decorators.push(tireSpray);
+}
 /**
  * createCity - Scenery Initializer.
  * Constructs the surrounding city skyline walls to enclose the game world.

@@ -130,9 +130,20 @@ export class TrafficCone {
         if (target instanceof Kart) {
             if (aabbIntersects(this.trafficCone, target.getBody())) {
                 console.log("COLISION CON KART DESDE TRAFFIC CONE");
+                // Determine whether the kart hit this cone while at near-maximum speed
+                const hitAtHighSpeed = (target.speed > 0) && (target.speed >= target.maxSpeed * 0.95);
+
                 // Resolve overlap and apply a speed penalty to the kart
                 resolvePenetrationObstacles(target, this, 0.01);
                 target.speed *= 0.5;
+                
+                // If the kart hit at high speed, trigger tire spray
+                if (hitAtHighSpeed && typeof tireSpray !== 'undefined' && tireSpray) {
+                    const intensity = Math.min(1.5, (target.speed / target.maxSpeed) * 1.5 + 0.8);
+                    tireSpray.burst(intensity);
+                }
+                // Notify the kart that it hit an obstacle so it can trigger effects
+                if ((target as any).notifyObstacleCollision) (target as any).notifyObstacleCollision();
             }
         }
     }
