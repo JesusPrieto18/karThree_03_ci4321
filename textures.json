@@ -36,7 +36,15 @@
   "raceTrack.normal": "src/textures/StacticObjects/RaceTrack/Road007_1K-JPG_NormalDX.jpg",
   
   "sky.hdr": "src/textures/Sky/autumn_hill_view_1k.hdr",
-  "sky.cubemapr": "src/textures/Sky/Cubemap/Cubemap_Sky_05-512x512.png",
+  "sky.cubemapDay": "src/textures/Sky/Cubemap/Cubemap_Sky_05-512x512.png",
+  "sky.cubemapNight": "src/textures/Sky/Cubemap/Cubemap_Sky_15-512x512.png",  
+  
+  "city.texture": "src/textures/Sky/city2Sky.png",
+  "cityNight.texture": "src/textures/Sky/cityNight.png",
+
+  "clouds.texture": "src/textures/Resource Boy - Cloud Textures/100.png",
+  "clouds2.texture": "src/textures/Resource Boy - Cloud Textures/88.png",
+  "clouds3.texture": "src/textures/Resource Boy - Cloud Textures/99.png",
   
   "trafficCone.ao": "src/textures/StacticObjects/Conne/plastic_0020_ao_1k.jpg",
   "trafficCone.normal": "src/textures/StacticObjects/Conne/plastic_0020_normal_direct_1k.png",

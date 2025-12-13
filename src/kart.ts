@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { scene } from './scene';
-import {solidWithWire, reflectDirection, disposeMesh } from './utils/utils';
+import {solidWithWire, disposeMesh } from './utils/utils';
 import { Shuriken } from './shuriken';
-import type {Proyectils, StaticObjects } from './models/colisionClass';
+import type {Proyectils} from './models/colisionClass';
 import { collisionObserver } from './utils/colliding';
 import { Coffee } from './coffee';
 import { Bomb } from './bomb';
@@ -31,6 +31,13 @@ export class Kart {
   private wheelAxisGroup: THREE.Group;
   private wheelsFrontAxis: THREE.Group;
   private wheelsBackAxis: THREE.Group;
+  
+  // headlights
+  private headlightsR: THREE.SpotLight;
+  private headlightsL: THREE.SpotLight;
+  private target: THREE.Object3D | THREE.Mesh;
+  private helperR: THREE.SpotLightHelper;
+  private switchLights: boolean = false;
 
   // Movement state (public for easy access from controls)
   public speed = 0;
@@ -57,6 +64,8 @@ export class Kart {
   private proyectilesList: Proyectils[] = []; // stored projectile instances (not yet launched)
   private proyectilLaunched: Map<number, Proyectils> = new Map();  // projectiles that have been launched
   private countProyectilesLaunched: number = 0;
+  // Timestamp (ms) of the last time the kart contacted an obstacle (wall, cone, etc.)
+  private lastObstacleContact: number = 0;
   /**
    * Constructor - builds the kart's visual components (chassis, extras, wheels),
    * adds the kart to the global scene and registers it with the collision observer.
@@ -71,7 +80,6 @@ export class Kart {
     body.translate(0, height / 3, 0);
     const material_color = 0xF7EA48;
     const material_color_dark = 0x1D252D;
-    const textureLoader = new THREE.TextureLoader(); 
     
     // Textures for the kart 
     const yellowTexture = getTexture("kar.yellowTexture");
@@ -101,6 +109,8 @@ export class Kart {
     mesh_capo.position.set(0,1.1,-0.7);
     this.kartChassis.add(mesh_capo);
 
+    //this.kartChassis.add(new THREE.AxesHelper(20));
+    
     let tope = new THREE.BoxGeometry(0.6,0.2,1);
     let material_tope = new THREE.MeshStandardMaterial({color:material_color, map: yellowTexture, normalMap: yellowTextureNormal, roughness: 0.3, metalness: 0.8});
     let mesh_tope = new THREE.Mesh(tope, material_tope);
@@ -148,10 +158,29 @@ export class Kart {
     let mesh_luces_delanteras = new THREE.Mesh(luces_delanteras, material_luces_delanteras);
     mesh_luces_delanteras.position.set(-0.5,0.6,2.21);
     this.kartChassis.add(mesh_luces_delanteras);
+    
+    this.target = new THREE.Object3D();
+    //this.target = new THREE.Mesh(new THREE.BoxGeometry(5,5,5), new THREE.MeshBasicMaterial({color:0xff0000}));
+    //this.target.position.copy(this.kartChassis.position);
+    //this.target.position.z -= 10;
+    scene.add(this.target);
+    
+    this.headlightsR = new THREE.SpotLight(0xffffff, 0, 30, 0.5, 0.5, 0.1);
+    this.headlightsR.position.set (-0.5,0.6,2.21)
+    //this.headlightsR.target = this.target;
+    this.kartChassis.add(this.headlightsR);
+    this.helperR = new THREE.SpotLightHelper(this.headlightsR);
+    this.kartChassis.add(this.helperR);
+    //this.kartChassis.add(this.target);
 
     let mesh_luces_delanteras2 = new THREE.Mesh(luces_delanteras, material_luces_delanteras);
     mesh_luces_delanteras2.position.set(0.5,0.6,2.21);
     this.kartChassis.add(mesh_luces_delanteras2);
+
+    this.headlightsL = new THREE.SpotLight(0xffffff, 0, 30, 0.5, 0.5, 0.1);
+    this.headlightsL.position.set (0.5,0.6,2.21)
+    this.kartChassis.add(this.headlightsL);
+    //this.kartChassis.add(new THREE.SpotLightHelper(this.headlightsL));
 
     const ventanaTexture = getTexture("kar.windowTexture");
     const ventanaTextureNormal = getTexture("kar.windowNormal");
@@ -197,7 +226,7 @@ export class Kart {
     // Assemble kart group and add helper axes for debugging
     this.kart.add(this.kartChassis);
     this.kart.position.set(0, 0.7,-3);
-    //this.kart.add(new THREE.AxesHelper(3));
+    this.kart.add(new THREE.AxesHelper(3));
 
     // Wheels and axes setup
     this.wheelAxisGroup = new THREE.Group();
@@ -274,6 +303,22 @@ export class Kart {
     return this.wheelAxisGroup;
   };
 
+  /**
+   * notifyObstacleCollision - called by obstacles when they detect a collision with this kart.
+   * Stores a timestamp so other systems can query whether the kart recently touched an obstacle.
+   */
+  public notifyObstacleCollision(): void {
+    this.lastObstacleContact = Date.now();
+  }
+
+  /**
+   * hasRecentObstacleContact - returns true when the kart collided with an obstacle within the
+   * specified timeout window (milliseconds). Default is 250ms.
+   */
+  public hasRecentObstacleContact(timeoutMs: number = 250): boolean {
+    return (Date.now() - this.lastObstacleContact) <= timeoutMs;
+  }
+
   /** getPowerUpsList - return the group containing active power-up visuals */
   public getPowerUpsList(): THREE.Group {
     return this.powerUpsList;
@@ -325,12 +370,8 @@ export class Kart {
    */
   public setPowerUps(count: number): void {
     if (this.powerUpsList.children.length === 0 && this.isActivatePowerUps) this.isActivatePowerUps = false;
-    if (!this.isActivatePowerUps) {
-      this.powerUps = count;
-      this.isActivatePowerUps = true;
 
-      this.powerUpsList.position.copy(this.kart.position);
-      console.log(this.powerUpsList.position);
+    // Points mapping for display when a power-up is collected
     const powerUpPoints: { [key: number]: number } = {
       0: 100,  // 1 shuriken
       1: 200,  // 2 shurikens
@@ -340,8 +381,19 @@ export class Kart {
       5: 200,  // 2 cafés
       6: 300   // 3 cafés
     };
-    
+
     const pointsEarned = powerUpPoints[count] || 100;
+
+    // If no active power-up set, create one as before. If there is an active power-up,
+    // allow stacking *only* for coffee consumables (cases 4/5/6) when the currently active
+    // power-up is already coffee. This prevents mixing incompatible types while allowing
+    // multiple coffee visuals to accumulate.
+    if (!this.isActivatePowerUps) {
+      this.powerUps = count;
+      this.isActivatePowerUps = true;
+
+      this.powerUpsList.position.copy(this.kart.position);
+      console.log(this.powerUpsList.position);
 
       switch (this.powerUps) {
         case 0:
@@ -468,9 +520,51 @@ export class Kart {
       showFloatingPoints(this.kart.position, pointsEarned);
       addPoints(pointsEarned);
       scene.add(this.powerUpsList);
-
     } else {
-      console.log("Ya tienes un power up activo");
+      // Already have an active power-up. If the newly picked one is a coffee
+      // consumable and the current active power-up is also coffee, append
+      // additional coffee visuals to the list instead of rejecting the pickup.
+      const isNewCoffee = [4, 5, 6].includes(count);
+      const isCurrentCoffee = [4, 5, 6].includes(this.powerUps);
+
+      if (isNewCoffee && isCurrentCoffee) {
+        console.log("Añadiendo café adicional al power-up activo");
+        // Add coffee visuals depending on the new count (1, 2 or 3)
+        switch (count) {
+          case 4: {
+            const c1 = new Coffee();
+            c1.setPosition(0, 0, -3);
+            this.powerUpsList.add(c1.getBody());
+            break;
+          }
+          case 5: {
+            const c1 = new Coffee();
+            const c2 = new Coffee();
+            c1.setX(-3);
+            c2.setX(3);
+            this.powerUpsList.add(c1.getBody(), c2.getBody());
+            break;
+          }
+          case 6: {
+            const c1 = new Coffee();
+            const c2 = new Coffee();
+            const c3 = new Coffee();
+            c1.setZ(-4);
+            c2.setPosition(3,0,1);
+            c3.setPosition(-3,0,1);
+            this.powerUpsList.add(c1.getBody(), c2.getBody(), c3.getBody());
+            break;
+          }
+        }
+        // Ensure HUD reflects the new total and type
+        setPowerUpType("coffee");
+        setPowerUpCount(this.powerUpsList.children.length);
+        showFloatingPoints(this.kart.position, pointsEarned);
+        addPoints(pointsEarned);
+        scene.add(this.powerUpsList);
+      } else {
+        console.log("Ya tienes un power up activo");
+      }
     }
   }
 
@@ -703,5 +797,27 @@ export class Kart {
     
   }
 
+  public animateHeadlights(): void {
+    this.target.position.x = this.kart.position.x + Math.sin(this.kart.rotation.y) * 10;
+    this.target.position.z = this.kart.position.z + Math.cos(this.kart.rotation.y) * 10;
+    this.headlightsR.target = this.target;
+    this.headlightsL.target = this.target;
+    this.helperR.update();
+  }
+
+  public switchHeadlights(): void {
+    this.switchLights = !this.switchLights;
+    if (this.switchLights) {
+      this.headlightsR.intensity = 8;
+      this.headlightsL.intensity = 8;
+    } else {
+      this.headlightsR.intensity = 0;
+      this.headlightsL.intensity = 0;
+    }
+  }
+
+  public getTarget(): THREE.Object3D | THREE.Mesh {
+    return this.target;
+  }
 }
 

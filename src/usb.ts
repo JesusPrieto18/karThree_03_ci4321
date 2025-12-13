@@ -33,6 +33,7 @@ export class USB {
         const aoTexture = getTexture("usb.ao");
         const texture = getTexture("usb.texture");
         const textureNormal = getTexture("usb.normal");
+        
         // Base color for the letters
         //const materialColor = 0x0000ff;
 
@@ -146,8 +147,8 @@ export class USB {
      * - Applies a slow rotation around Y for subtle motion.
      * Call this from the main animation loop if desired.
      */
-    public animate(): void {
-      this.usbMesh.position.y = Math.sin(Date.now() * 0.002) * 0.5 + 0.55;
+    public animate(deltaTime: number): void {
+      this.usbMesh.position.y = Math.sin(deltaTime * 0.002) * 0.5 + 0.55;
       this.usbMesh.rotation.y += 0.001;
     }
 }

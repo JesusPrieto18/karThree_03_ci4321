@@ -1,4 +1,4 @@
-import { kart } from './utils/initializers';
+import { kart, dayNightCycle, rain, clouds, tireSpray } from './utils/initializers';
 import { calculateWheelRotation} from './utils/utils';
 import { camera } from './scene.ts';
 import * as THREE from 'three';
@@ -31,7 +31,8 @@ let currentCameraHeight = 2;
  */
 let cameraMode: number = 0;
 let rMode: number = 0; // 0: third-person, 1: first-person
-let godMode: boolean = false;
+export let godMode: boolean = false;
+export let timeMode: boolean = false;
 
 /**
  * setupControls - register keyboard listeners and populate the `keys` state map.
@@ -58,6 +59,20 @@ export function setupControls(): void {
     }
   });
 
+  // Toggle reverse/first-person submode when 'b' is pressed
+  window.addEventListener('keypress', e => {
+    if (e.key === 'l' || e.key === 'L') {
+      kart.switchHeadlights();
+    }
+  });
+
+  // Toggle third-person submode when 'v' is pressed
+  window.addEventListener('keypress', e => {
+    if (e.key === 'v' || e.key === 'V') {
+      cameraMode = cameraMode === 2? cameraMode = 0 : cameraMode = 2; 
+    }
+  });
+
   // Toggle godMode when 'g' is pressed
   window.addEventListener('keypress', e => {
     if (e.key === 'g' || e.key === 'G') {
@@ -68,6 +83,19 @@ export function setupControls(): void {
         console.log("GodMode activado");
       }
       godMode = !godMode;
+    }
+  });
+
+  // Toggle godMode when 'g' is pressed
+  window.addEventListener('keypress', e => {
+    if (e.key === 't' || e.key === 'T') {
+      console.log("Tecla t presionada");
+      if (timeMode) {
+        console.log("timeMode desactivado");
+      } else {
+        console.log("timeMode activado");
+      }
+      timeMode = !timeMode;
     }
   });
 }
@@ -89,6 +117,26 @@ export function updateControls(): void {
   if (!keys['ArrowUp'] && !keys['ArrowDown']) kart.speed *= 0.95;
   updateVelocity(kart.speed, kart.maxSpeed);
 
+  // Detect sudden acceleration to trigger tire spray
+  // Use a simple finite-difference between frames
+  if (typeof (updateControls as any).__prevSpeed === 'undefined') (updateControls as any).__prevSpeed = kart.speed;
+  const prevSpeed = (updateControls as any).__prevSpeed as number;
+  const accel = kart.speed - prevSpeed;
+  // threshold tuned experimentally: accel > 0.02 considered a violent acceleration
+  // Also trigger when accelerating while contacting an obstacle (wall / cone)
+  const accelThreshold = 0.02;
+  const isAccelerating = keys['ArrowUp'];
+  const hittingObstacle = (kart as any).hasRecentObstacleContact ? (kart as any).hasRecentObstacleContact(300) : false;
+  if (isAccelerating && (accel > accelThreshold || hittingObstacle) && tireSpray) {
+    // normalize intensity (0..1.5). If the kart is pushing against an obstacle
+    // but not actually changing speed, use a reasonable default intensity.
+    let intensity: number;
+    if (accel > accelThreshold) intensity = Math.min(1.5, accel / 0.05);
+    else intensity = 0.9;
+    tireSpray.burst(intensity);
+  }
+  (updateControls as any).__prevSpeed = kart.speed;
+
   // Steering: adjust steeringAngle and rotate kart body when moving
   if (keys['ArrowRight']) {
     kart.steeringAngle = Math.max(kart.steeringAngle - kart.steeringSpeed, -kart.maxSteering);
@@ -107,7 +155,10 @@ export function updateControls(): void {
   if (!keys['ArrowLeft'] && !keys['ArrowRight']) {
     kart.steeringAngle *= 0.8;
   }
-
+  // Gradually return steering to center when no left/right pressed
+  if (!keys['ArrowLeft'] && !keys['ArrowRight']) {
+    kart.steeringAngle *= 0.8;
+  }
   // Launch power-ups when space is pressed (single activation per keypress)
   if (keys[' ']) {
     kart.launchPowerUps();
@@ -126,10 +177,21 @@ export function updateControls(): void {
     if (keys['-']) { kart.clearPowerUps(); }
   }
 
+  // Time mode: set day/night cycle and rain mode
+  if (timeMode) {
+    if (keys['0']) { dayNightCycle.changeDayTime(0); keys['0'] = false; }
+    if (keys['1']) { dayNightCycle.changeDayTime(1); keys['1'] = false; }
+    if (keys['2']) { dayNightCycle.changeDayTime(2); keys['2'] = false; } 
+    if (keys['3']) { rain.rainingOn(); keys['3'] = false; }
+    if (keys['4']) { clouds.setRaining(); keys['4'] = false; }
+  }
+  
   // Move kart forward in the world according to its rotation.y and speed
   kart.getBody().position.x += Math.sin(kart.getBody().rotation.y) * kart.speed;
   kart.getBody().position.z += Math.cos(kart.getBody().rotation.y) * kart.speed;
-
+  //kart.getTarget().position.x = kart.getBody().position.x + Math.sin(kart.getBody().rotation.y) * 10;
+  //kart.getTarget().position.z = kart.getBody().position.z + Math.cos(kart.getBody().rotation.y) * 10;
+  
   // Rotate wheels visually based on translational speed.
   // Uses wheel.userData.radius if available, otherwise defaults to 0.3.
   kart.getWheelsFrontAxis().children.forEach((wheel) => {

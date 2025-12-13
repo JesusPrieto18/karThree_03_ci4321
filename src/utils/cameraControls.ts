@@ -11,10 +11,10 @@ export function createCameraControls(
 
   // Configuración básica de los controles
   controls.enableDamping = true;
-  controls.dampingFactor = 0.05;
+  controls.dampingFactor = 0.5;
   controls.enablePan = true;  // mover cámara
   controls.enableZoom = true; // hacer zoom
-  controls.rotateSpeed = 0.05   // velocidad de giro
+  controls.rotateSpeed = 0.5   // velocidad de giro
 
   return controls;
 }

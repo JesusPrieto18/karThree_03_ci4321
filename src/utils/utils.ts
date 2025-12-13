@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import type { CollisionClassName, ReflectObjects, StaticObjects } from "../models/colisionClass";
 import { Shuriken } from "../shuriken";
-import type { roughness } from "three/tsl";
 
 /**
  * Utility functions used across the project.

@@ -81,6 +81,7 @@ Se alternan con la tecla `C`.
 | **Flecha derecha** | Girar a la derecha |
 | **C** | Cambiar cámara |
 | **B** | Alternar con vista reversa |
+| **V** | Control total de la cámara |
 | **Espacio** | Usar PowerUp|
 
 ---
@@ -98,6 +99,18 @@ Se alternan con la tecla `C`.
 | **5** | Cafe Doble |
 | **6** | Cafe Triple |
 |**Minus (-)**| Elimina el PowerUp Cargado para elegir otro |
+---
+
+### Controles Modo Time
+
+| Tecla | Acción |
+|-------|--------|
+| **T** | Activar/Desactivar Modo tiempo |
+| **0** | Dia |
+| **1**| Noche |
+| **2** |Automatico|
+| **3** |Nublado|
+| **4** |Lluvia|
 ---
 ### Sistema de Puntación
 
@@ -129,47 +142,81 @@ El proyecto usa un **Collision Observer** central que mantiene una lista de obje
 
 ---
 ## Arquitectura
+Archivos principales de la arquitectura del proyecto. 
 
-``` bash 
-|── node_modules
-src/
+```bash
+|── node_modules/                # Dependencias instaladas por npm
+|── src/                         # Código fuente principal del juego
+│   ├── effects/                 # Efectos visuales y ambientales
+│   │   ├── clouds.ts            # Lógica y renderizado de nubes animadas
+│   │   ├── rain.ts              # Lógica y renderizado de lluvia
+│   ├── imports/                 # Modelos y texturas importados de terceros
+│   │   ├── low_poly_street_light/           # Faroles low poly
+│   ├── models/                  # Clases base y de colisión
+│   │   └── colisionClass.ts     # Clase base para objetos colisionables
+│   ├── textures/                # Texturas organizadas por tipo
+│   │   ├── Hud/                 # Texturas para la interfaz HUD
+│   │   ├── Kar/                 # Texturas y descripciones para el kart
+│   │   │   ├── metal_0065_description.txt
+│   │   │   ├── metal_0065_keywords.txt
+│   │   │   ├── plastic_0022_description.txt
+│   │   │   ├── plastic_0022_keywords.txt
+│   │   ├── PowerUps/           # Texturas para power-ups
+│   │   │   ├── Bomb/
+│   │   │   ├── Coffee/
+│   │   │   ├── Shuriken/
+│   │   ├── Resource Boy - Cloud Textures/   # Texturas de nubes
+│   │   │   └── License.txt
+│   │   ├── Sky/                 # Cielos y cubemaps
+│   │   │   ├── autumn_hill_view_1k.hdr
+│   │   │   ├── License.txt
+│   │   │   └── Cubemap/
+│   │   ├── StacticObjects/      # Texturas para objetos estáticos
+│   │   │   ├── Conne/
+│   │   │   ├── Ground/
+│   │   │   ├── PowerBox/
+│   │   │   ├── RaceTrack/
+│   │   │   ├── Usb/
+│   │   │   └── Walls/
+│   ├── utils/                   # Utilidades y lógica auxiliar
+│   │   ├── animation.ts         # Loop de animación principal
+│   │   ├── cameraControls.ts    # Control de cámara y vistas
+│   │   ├── colliding.ts         # Lógica del patrón Observer para colisiones
+│   │   ├── initializers.ts      # Inicialización de objetos y escena
+│   │   ├── textureManager.ts    # Gestión y carga de texturas
+│   │   ├── utils.ts             # Funciones utilitarias generales
+│   ├── bomb.ts                  # Clase Bomb: proyectil con gravedad y temporizador
+│   ├── box.ts                   # Obstáculos tipo caja
+│   ├── city.ts                  # Escenografía de ciudad de fondo
+│   ├── coffee.ts                # Power-up tipo café (aumenta velocidad)
+│   ├── controls.ts              # Manejo de controles del jugador
+│   ├── dayNightCycle.ts         # Ciclo día/noche y luz ambiental
+│   ├── ground.ts                # Lógica y renderizado del suelo
+│   ├── hud.ts                   # Interfaz HUD y puntos
+│   ├── kart.ts                  # Lógica y modelo del kart principal
+│   ├── powerUps.ts              # Lógica de power-ups recogibles
+│   ├── raceTrack.ts             # Clase RaceTrack: pista y colisiones
+│   ├── scene.ts                 # Configuración de la escena principal
+│   ├── shuriken.ts              # Clase Shuriken: proyectil giratorio
+│   ├── shurikenInfo.ts          # Datos de geometría del shuriken
+│   ├── skyBox.ts                # Renderizado del skybox
+│   ├── streetLamp.ts            # Lámparas de calle
+│   ├── trafficCone.ts           # Obstáculo tipo cono
+│   ├── usb.ts                   # Objeto USB decorativo
+│   ├── walls.ts                 # Muros y límites de la pista
 │
-├── models/
-├── textures/
-│  ├── colisionClass #Contiene las Clases que colisionan 
-├── utils/ #Diferentes utilidades para facilitar ciertos procesos
-    ├── animation.ts
-    ├── cameraControls.ts
-    ├── colliding.ts #Aquí esta la logica para el patro Observer usado para colisones
-    ├── textureManager.ts
-    ├── initializers.ts
-│ ├── bomb.ts # Clase Bomb → proyectil con gravedad y temporizador de explosión
-│ ├── box.ts # Genera cajas u obstáculos simples en la pista
-│ ├── coffee.ts # Power-up tipo “café” que otorga velocidad
-│ ├── controls.ts # Manejo de teclas y controles del jugador (movimiento, disparo, cámara)
-│ ├── Ground.ts 
-│ ├── hud.ts # Interfaz 2D implementando Sprite Atlas
-│ ├── kart.ts # Clase principal del Kart (posición, rotación, animación, lanzamiento de power-ups)
-│ ├── powerUps.ts # Manejo de objetos recogibles y su lógica (activar, girar, lanzar)
-│ ├── RaceTrack.ts # Clase RaceTrack → encapsula la pista y sus interacciones (colisiones, suelo)
-│ ├── scene.ts # Configura la escena principal de Three.js (luz, cámara, render)
-│ ├── shuriken.ts # Clase Shuriken → proyectil giratorio
-│ ├── shurikenInfo.ts # Datos de geometría (vértices y colores) del shuriken
-│ ├── trafficCone.ts # Clase TrafficCone → obstáculo tipo cono con colisión
-│ ├── usb.ts #Objeto para el Modelo de USB siglas
-│ ├── walls.ts # Clase Walls → muros y límites de la pista
-│
-|── .gitignore 
-|── index.html 
-|── LICENSE # Licencia Creativa Libre (MIT)
-|── main.ts # Punto de entrada del juego (crea escena, inicia loop principal, renderiza)
-|── package-lock.json 
-|── package.json
-|── README.md
-|── style.css
-|── texture.json
-|── tsconfig.json 
-|── update.ts
+|── .gitignore                   # Archivos y carpetas ignorados por git
+|── index.html                   # HTML principal del juego
+|── LICENSE                      # Licencia del proyecto (MIT)
+|── main.ts                      # Punto de entrada: inicializa y ejecuta el juego
+|── package-lock.json            # Lockfile de dependencias npm
+|── package.json                 # Configuración y dependencias del proyecto
+|── README.md                    # Documentación principal
+|── style.css                    # Estilos CSS para la interfaz
+|── textures.json                # Configuración de texturas
+|── tsconfig.json                # Configuración de TypeScript
+|── update.ts                    # Lógica de actualización general para el textures.json
+```
 ```
 ## Tecnologías usadas
 - ThreeJS
