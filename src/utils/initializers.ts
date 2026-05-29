@@ -69,7 +69,7 @@ export function createTrafficCone(): void {
 
 /** createWall - convenience helper to create a single wall (defaults used). */
 export function createWall(): void {
-  const walls = new Walls();
+  new Walls();
 }
 
 /**
@@ -220,7 +220,6 @@ export function createConeSquare(
   centerX: number = 0,
   centerZ: number = 0,
   sideLength: number = 20,
-  y: number = 0
 ): void {
   const n = Math.max(2, Math.floor(countPerSide));
   const half = sideLength / 2;
@@ -260,7 +259,7 @@ export function createConeSquare(
  * This serves as the physics collider and visual base for the kart.
  */
 export function createGround(){
-  const ground = new Ground(150,150);
+  new Ground(150,150);
 }
 
 /**
@@ -272,7 +271,7 @@ export function createGround(){
  * @param thickness Width of the road (distance between inner and outer wall).
  */
 export function createHollowSquare(size?: number, thickness?: number){
-  const group = new RaceTrack(size, thickness);
+  new RaceTrack(size, thickness);
 }
 
 /**
@@ -318,7 +317,7 @@ export function createTireSpray(): void {
  * @param depth Depth (Z-axis) of the city perimeter.
  */
 export function createCity(width: number, height: number, depth: number): void {
-  const city = new City(width, height, depth);
+  new City(width, height, depth);
 }
 
 /**

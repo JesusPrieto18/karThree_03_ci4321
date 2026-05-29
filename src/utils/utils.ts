@@ -89,16 +89,6 @@ function getLocalBox(mesh: THREE.Mesh): THREE.Box3 {
 }
 
 /**
- * invalidateLocalBox - call this when you modify the vertex positions of a geometry
- * (attributes.position). It forces recomputation and updates the cached box.
- */
-function invalidateLocalBox(mesh: THREE.Mesh) {
-  const geo = mesh.geometry as THREE.BufferGeometry;
-  geo.computeBoundingBox();
-  localBoxCache.set(geo, geo.boundingBox!.clone());
-}
-
-/**
  * worldAABB_Mesh - compute the world-space AABB for a Mesh by transforming the cached local box
  * with the mesh's world matrix.
  */

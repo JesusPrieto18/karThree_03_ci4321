@@ -7,6 +7,7 @@ import { collisionObserver } from './utils/colliding';
 import { Kart } from './kart';
 import { Bomb } from './bomb';
 import { getTexture } from './utils/textureManager';
+import { tireSpray } from './utils/initializers';
 
 /**
  * TrafficCone - builds a visual traffic cone composed of a cone + base + white bands.

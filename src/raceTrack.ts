@@ -28,7 +28,7 @@ export class RaceTrack {
    * @param thickness plane thickness (Z axis)
    * @param color material color for the track
    */
-  constructor(size: number = 1, thickness: number = 0.05, color: number = 0x222222) {
+  constructor(size: number = 1, thickness: number = 0.05) {
         
     const texture = getTexture('raceTrack.texture');
     texture.wrapS = THREE.RepeatWrapping;

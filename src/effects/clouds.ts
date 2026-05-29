@@ -243,7 +243,7 @@ export class Clouds {
      * Toggles the active state of the storm system.
      * @param rain Optional boolean to force state. If undefined, toggles current state.
      */
-    public setRaining(rain?:boolean): void{
+    public setRaining(): void{
         this.isRaining = !this.isRaining;
 
         if(this.isRaining) {

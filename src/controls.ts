@@ -115,7 +115,7 @@ export function updateControls(): void {
   if (keys['ArrowDown']) kart.speed = Math.max(-kart.maxSpeed/2, kart.speed - 0.005);
   if (keys['ArrowUp']) kart.speed = Math.min(kart.maxSpeed, kart.speed + 0.005);
   if (!keys['ArrowUp'] && !keys['ArrowDown']) kart.speed *= 0.95;
-  updateVelocity(kart.speed, kart.maxSpeed);
+  updateVelocity(kart.speed);
 
   // Detect sudden acceleration to trigger tire spray
   // Use a simple finite-difference between frames

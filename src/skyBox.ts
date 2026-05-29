@@ -126,7 +126,7 @@ export class SkyBox {
      * Rotates the skybox slowly to simulate planetary rotation.
      * @param deltaTime Time elapsed since last frame.
      */
-    public animate(deltaTime: number): void {
+    public animate(): void {
         // Slow Y-axis rotation
         this.skyBoxMeshDay.rotation.y += 0.0005;
         this.skyBoxMeshNight.rotation.y += 0.0005;

@@ -72,7 +72,7 @@ export class StreetLight {
      * Updates the light state based on the Day/Night cycle.
      * @param now Current timestamp (unused here but standard for animate loops).
      */
-    public animate(now: number): void {
+    public animate(): void {
         // Retrieve the current state from the global cycle manager
         let isDay = dayNightCycle.getIsDay();
 

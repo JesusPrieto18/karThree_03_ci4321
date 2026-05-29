@@ -9,14 +9,12 @@ export class Box {
     // The root Group that holds all parts of the box
     private body: THREE.Group = new THREE.Group();
     // optional name passed to constructor (not strictly required)
-    private name?: string; 
     
     /**
      * Constructor - builds the box geometry and materials, then composes them into the body group.
      * @param name Optional name for identification.
      */
-    constructor(name?: string) {
-      this.name = name;
+    constructor() {
 
       // A central cube mesh (unused in final composition, left here for reference)
       const geometry = new THREE.BoxGeometry(1, 1, 1);

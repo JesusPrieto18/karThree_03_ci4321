@@ -6,7 +6,6 @@ let hudScene: THREE.Scene | null = null;
 let hudCamera: THREE.OrthographicCamera | null = null;
 
 let atlasTexture: THREE.Texture | null = null;
-const ATLAS_TILE = 64;
 const ATLAS_COLS = 14;
 const ATLAS_ROWS = 1;
 
@@ -24,23 +23,6 @@ let activePopups: HUDPopup[] = [];
 
 type PowerUpType = 'none' | 'shuriken' | 'coffee' | 'bomb';
 
-// Cargar textura PNG
-function loadAtlasTexture(path: string): Promise<THREE.Texture> {
-  return new Promise((resolve, reject) => {
-    const loader = new THREE.TextureLoader();
-    loader.load(
-      path,
-      (texture) => {
-        texture.magFilter = THREE.NearestFilter;
-        texture.minFilter = THREE.NearestFilter;
-        texture.flipY = true;
-        resolve(texture);
-      },
-      undefined,
-      (err) => reject(err)
-    );
-  });
-}
 
 // Crear sprite desde atlas con soporte para múltiples filas
 function makeSpriteFromAtlas(tileIndex: number, size: number) {
@@ -257,7 +239,8 @@ export function showFloatingPoints(worldPos: THREE.Vector3, value: number, durat
   
   for (let i = 0; i < digits.length; i++) {
     const dm = makeDigitMesh(4 + (digits[i] % 10), size);
-    dm.material = (dm.material as THREE.Material).clone();
+    const material = dm.material as THREE.MeshBasicMaterial;
+    dm.material = material.clone();
     (dm.material as THREE.MeshBasicMaterial).transparent = true;
     dm.position.set((i - (digits.length - 1) / 2) * spacing, 0, 0);
     group.add(dm);
@@ -349,7 +332,7 @@ export function setPowerUpCount(n: number) {
 }
 
 // Actualizar velocidad (tacómetro digital)
-export function updateVelocity(v: number, maxSpeed = 1) {
+export function updateVelocity(v: number) {
   const speedDisplay = Math.round(Math.abs(v) * 1000);
   if (tachDigitMeshes && tachDigitMeshes.length) {
     setDigitMeshesValue(tachDigitMeshes, speedDisplay);

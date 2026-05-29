@@ -25,9 +25,8 @@ export class Ground {
    * Build a horizontal plane and register it in the scene + collision system.
    * @param width plane width (X axis)
    * @param length plane length (Z axis)
-   * @param color material color for the track
    */
-  constructor(width: number = 100, length: number = 100, color: number = 0x6aa84f) {
+  constructor(width: number = 100, length: number = 100) {
     const geometry = new THREE.PlaneGeometry(width, length);
 
     const aoTexture = getTexture('ground.ao');

@@ -86,7 +86,7 @@ export class Rain {
      * Moves every drop downward and handles recycling logic.
      * @param deltaTime Timestamp (unused here as velocity is per-frame constant, but good practice).
      */
-    public animate(deltaTime: number): void {
+    public animate(): void {
         
         if (!this.isRaining) return;
        

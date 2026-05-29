@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 import { createCameraControls } from './utils/cameraControls';
 /**
  * Global scene objects exported for use across the app.
