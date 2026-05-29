@@ -160,7 +160,7 @@ export class Clouds {
         this.thunderSound = new THREE.Audio(this.listener);
         
         // Load the thunder sound file asynchronously
-        audioLoader.load('src/effects/thunder-sound-effect.mp3', (buffer) => {
+        audioLoader.load('pubilc/effects/thunder-sound-effect.mp3', (buffer) => {
             this.thunderSound!.setBuffer(buffer);
             this.thunderSound!.setLoop(false); // Play once per event
             this.thunderSound!.setVolume(0.8); // High volume for impact

@@ -49,7 +49,7 @@ export class StreetLight {
         
         // 3. Load the Visual Mesh
         const loader = new GLTFLoader();
-        loader.load('src/imports/low_poly_street_light/scene.gltf', (gltf) => {
+        loader.load('public/imports/low_poly_street_light/scene.gltf', (gltf) => {
             // Offset the model slightly (z-5) to align the mesh with the light source position
             gltf.scene.position.set(x, 0, z - 5);
             this.group.add(gltf.scene);

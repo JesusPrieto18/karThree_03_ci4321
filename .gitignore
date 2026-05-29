@@ -79,3 +79,5 @@ firstVersion
 !public/textures/StacticObjects/Walls/bricks_0007_ao_1k.jpg
 !public/textures/StacticObjects/Walls/bricks_0007_normal_directx_1k.png
 !public/textures/StacticObjects/Walls/bricks_0007_roughness_1k.jpg
+!public/imports/low_poly_street_light/textures/*
+!public/imports/low_poly_street_light/*
