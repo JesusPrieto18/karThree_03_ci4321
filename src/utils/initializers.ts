@@ -7,10 +7,10 @@ import { Ground } from "../ground";
 import { RaceTrack } from "../raceTrack";
 import { SkyBox } from "../skyBox";
 import { DayNightCycle } from "../dayNightCycle";
-import { Rain } from "../effects/rain";
-import { TireSpray } from "../effects/tireSpray";
+import { Rain } from "../../public/effects/rain";
+import { TireSpray } from "../../public/effects/tireSpray";
 import { City } from "../city";
-import { Clouds } from "../effects/clouds";
+import { Clouds } from "../../public/effects/clouds";
 import { StreetLight } from "../streetLamp";
 
 /*

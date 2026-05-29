@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { getTexture } from '../utils/textureManager';
-import { scene } from '../scene';
+import { getTexture } from '../../src/utils/textureManager';
+import { scene } from '../../src/scene';
 import { lerp } from 'three/src/math/MathUtils.js';
 
 /**

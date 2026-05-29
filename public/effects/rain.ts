@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { scene } from '../scene';
-import { kart } from '../utils/initializers';
+import { scene } from '../../src/scene';
+import { kart } from '../../src/utils/initializers';
 
 /**
  * Rain - High Performance Weather System.

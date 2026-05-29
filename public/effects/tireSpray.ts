@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { scene } from '../scene';
-import { Kart } from '../kart';
+import { scene } from '../../src/scene';
+import { Kart } from '../../src/kart';
 
 /**
  * TireSpray - simple particle system that emits smoke/dust from the rear
