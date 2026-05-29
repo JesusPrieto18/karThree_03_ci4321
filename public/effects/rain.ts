@@ -74,7 +74,7 @@ export class Rain {
         this.rainSound = new THREE.Audio(this.listener);
         
         // Load ambient loop asynchronously
-        audioLoader.load('public/effects/rain-01.mp3', (buffer) => {
+        audioLoader.load('/effects/rain-01.mp3', (buffer) => {
             this.rainSound!.setBuffer(buffer);
             this.rainSound!.setLoop(true); // Enable continuous looping
             this.rainSound!.setVolume(0.3); // Background volume
